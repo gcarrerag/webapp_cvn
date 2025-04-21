@@ -96,15 +96,18 @@ function Admin() {
     window.location.href = "/login";
   };
 
-  const comandesFiltrades = comandes.filter((c) => {
-    const dataComanda = new Date(c.data).toISOString().split("T")[0];
-    const compleixData = !filtreData || filtreData === dataComanda;
-    const compleixEstat = filtreEstat === "tots" || c.estat === filtreEstat;
-    const compleixEnviament = filtreEnviament === "tots" || c.enviament === filtreEnviament;
-    const cercaText = filtreCerca.toLowerCase();
-    const compleixCerca = c.nom.toLowerCase().includes(cercaText) || c.telefon.includes(cercaText);
-    return compleixData && compleixEstat && compleixEnviament && compleixCerca;
-  });
+  const comandesArray = Array.isArray(comandes) ? comandes : [];
+
+	const comandesFiltrades = comandesArray.filter((c) => {
+	  const dataComanda = new Date(c.data).toISOString().split("T")[0];
+	  const compleixData = !filtreData || filtreData === dataComanda;
+	  const compleixEstat = filtreEstat === "tots" || c.estat === filtreEstat;
+	  const compleixEnviament = filtreEnviament === "tots" || c.enviament === filtreEnviament;
+	  const cercaText = filtreCerca.toLowerCase();
+	  const compleixCerca = c.nom.toLowerCase().includes(cercaText) || c.telefon.includes(cercaText);
+	  return compleixData && compleixEstat && compleixEnviament && compleixCerca;
+	});
+
 
   const exportarExcel = () => {
     const dades = comandesFiltrades.map(c => ({

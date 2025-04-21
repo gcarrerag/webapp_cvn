@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@stripe/stripe-js": "^7.1.0",
+    "@supabase/supabase-js": "^2.49.4",
     "@tiptap/react": "^2.11.7",
     "@tiptap/starter-kit": "^2.11.7",
     "better-sqlite3": "^11.9.1",

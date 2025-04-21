@@ -1,27 +1,36 @@
 import { NextResponse } from "next/server";
-import db from "../../../db";
+import supabase from "@/lib/supabase";
 
-// 🔥 GET: Llistar totes les notícies
+// 🔵 GET: Llistar totes les notícies
 export async function GET() {
-  const consulta = db.prepare("SELECT * FROM noticies ORDER BY id DESC");
-  const noticies = consulta.all();
-  return NextResponse.json(noticies);
+  const { data, error } = await supabase
+    .from("noticies")
+    .select("*")
+    .order("id", { ascending: false });
+
+  if (error) {
+    console.error("Error obtenint notícies:", error);
+    return NextResponse.json({ error: "Error obtenint notícies" }, { status: 500 });
+  }
+
+  return NextResponse.json(data);
 }
 
-// 🔥 POST: Crear una nova notícia
+// 🟢 POST: Crear una nova notícia
 export async function POST(request) {
-  const formData = await request.formData(); // 👈🏻 Recollim FormData
-  const titol = formData.get("titol");
-  const contingut = formData.get("cos");
-  const imatge = formData.get("imatge")?.name || null; // 👈🏻 Agafem només el nom, o null
-
+  const { titol, contingut, imatge } = await request.json();
   const dataActual = new Date().toISOString();
 
-  const inserir = db.prepare(`
-    INSERT INTO noticies (titol, contingut, imatge, data)
-    VALUES (?, ?, ?, ?)
-  `);
-  inserir.run(titol, contingut, imatge, dataActual);
+  const { data, error } = await supabase
+    .from("noticies")
+    .insert([
+      { titol, contingut, imatge, data: dataActual }
+    ]);
+
+  if (error) {
+    console.error("Error creant notícia:", error);
+    return NextResponse.json({ error: "Error creant notícia" }, { status: 500 });
+  }
 
   return NextResponse.json({ missatge: "Notícia creada ✅" });
 }
