@@ -131,7 +131,7 @@ function Admin() {
 
         {/* Capçalera i sessió */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">\ud83d\udc69 Carla Carrera⚕️ Panell d'administració</h1>
+          <h1 className="text-2xl font-bold">\ud83d\udc69 Carla Carrera⚕️ Panell administració</h1>
           <button onClick={tancarSessio} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Tancar sessió</button>
         </div>
 
@@ -142,7 +142,7 @@ function Admin() {
 	  <input name="preu" placeholder="Preu (€)" value={formulari.preu} onChange={handleChange} type="number" required className="border px-4 py-2 rounded" />
 	  <input name="imatge" placeholder="Nom imatge (ex: producte1.jpg)" value={formulari.imatge} onChange={handleChange} required className="border px-4 py-2 rounded" />
 	  
-	  {/* Nou: Tipus d'animal */}
+	  {/* Nou: Tipus animal */}
 	  <select name="animal" value={formulari.animal} onChange={handleChange} required className="border px-4 py-2 rounded">
 	    <option value="">Selecciona Animal</option>
 	    <option value="gos">Gos</option>
