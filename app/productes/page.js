@@ -11,9 +11,20 @@ export default function Productes() {
 
   useEffect(() => {
     const carregar = async () => {
-      const res = await fetch("/api/productes");
-      const dades = await res.json();
-      setProductes(dades);
+      try {
+        const res = await fetch("/api/productes");
+        const dades = await res.json();
+
+        if (Array.isArray(dades)) {
+          setProductes(dades);
+        } else {
+          console.error("Resposta inesperada de /api/productes:", dades);
+          setProductes([]);
+        }
+      } catch (error) {
+        console.error("Error carregant productes:", error);
+        setProductes([]);
+      }
     };
     carregar();
   }, []);
@@ -103,6 +114,7 @@ export default function Productes() {
     </div>
   );
 }
+
 
 
 
