@@ -1,0 +1,29 @@
+"use client";
+
+import Link from "next/link";
+import Navbar from "../components/Navbar";
+
+export default function Home() {
+  return (
+    <div>
+      <Navbar />
+
+      <main className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-b from-white to-blue-50 p-8 text-center">
+        <div className="bg-white rounded-3xl shadow-xl px-8 py-12 max-w-2xl w-full space-y-6">
+          <h1 className="text-4xl font-bold text-blue-800">🐾 Benvinguts a la botiga del Centre Veterinari Navarcles</h1>
+          <p className="text-gray-700 text-lg">
+            Cuida la salut i el benestar de la teva mascota amb productes de qualitat.
+          </p>
+
+          <Link href="/productes">
+            <button className="mt-4 bg-blue-600 text-white text-lg px-6 py-3 rounded-full shadow hover:bg-blue-700 transition">
+              Descobreix els nostres productes
+            </button>
+          </Link>
+        </div>
+
+        <p className="mt-10 text-sm text-gray-500">Centre Veterinari Navarcles © {new Date().getFullYear()}</p>
+      </main>
+    </div>
+  );
+}

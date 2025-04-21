@@ -1,0 +1,17 @@
+import { NextResponse } from "next/server";
+import db from "../../../../db";
+
+// GET: obtenir un producte per id
+export async function GET(_, { params }) {
+  const consulta = db.prepare("SELECT * FROM productes WHERE id = ?");
+  const producte = consulta.get(params.id);
+  if (!producte) return NextResponse.json({ error: "No trobat" }, { status: 404 });
+  return NextResponse.json(producte);
+}
+
+// DELETE (si ja el tens, no el repeteixis)
+export async function DELETE(_, { params }) {
+  const eliminar = db.prepare("DELETE FROM productes WHERE id = ?");
+  eliminar.run(params.id);
+  return NextResponse.json({ missatge: "Producte eliminat ✅" });
+}

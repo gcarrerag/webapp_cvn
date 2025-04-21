@@ -1,0 +1,56 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Navbar from "../../components/Navbar";
+import Link from "next/link";
+
+export default function Productes() {
+  const [productes, setProductes] = useState([]);
+
+  useEffect(() => {
+    const carregar = async () => {
+      const res = await fetch("/api/productes");
+      const dades = await res.json();
+      setProductes(dades);
+    };
+    carregar();
+  }, []);
+
+  return (
+    <div>
+      <Navbar />
+
+      <main className="min-h-screen bg-gray-50 py-16 px-6 md:px-20">
+        <header className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-blue-800 mb-3">Els nostres productes</h1>
+          <p className="text-gray-600 text-lg">Qualitat veterinària per al benestar del teu animal</p>
+        </header>
+
+        {productes.length === 0 ? (
+          <p className="text-center text-gray-500">Encara no hi ha productes disponibles.</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+            {productes.map((prod) => (
+              <Link
+                key={prod.id}
+                href={`/productes/${prod.id}`}
+                className="bg-white rounded-xl shadow hover:shadow-md transition p-4 flex flex-col items-center text-center"
+              >
+                {prod.imatge && (
+                  <img
+                    src={prod.imatge}
+                    alt={prod.nom}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                )}
+                <h2 className="text-lg font-semibold text-blue-800">{prod.nom}</h2>
+                <p className="text-sm text-gray-600">{prod.descripcio}</p>
+                <p className="mt-2 text-green-600 font-bold">{prod.preu} €</p>
+              </Link>
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
