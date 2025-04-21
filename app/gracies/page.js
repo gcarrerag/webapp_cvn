@@ -31,7 +31,7 @@ export default function Gracies() {
             ✅ Gràcies per la teva comanda!
           </h1>
           <p className="text-gray-600 mb-8">
-            Ens posarem en contacte amb tu molt aviat per confirmar l'enviament o la recollida.
+            Ens posarem en contacte amb tu molt aviat per confirmar l&apos;enviament o la recollida.
           </p>
 
           <div className="text-left text-gray-800">

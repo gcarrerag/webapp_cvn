@@ -15,7 +15,7 @@ export default function QuiSom() {
         <section className="bg-white p-8 rounded shadow mb-10">
           <h2 className="text-2xl font-bold mb-4 text-gray-800">Centre Veterinari Navarcles</h2>
           <p className="text-gray-700 leading-relaxed mb-6">
-            Fundat l'any <strong>1990</strong> pel veterinari <strong>Josep Maria Carrera</strong>, el nostre centre ha estat des de llavors un referent en la cura de les mascotes a Navarcles i rodalies.
+            Fundat l&apos;any <strong>1990</strong> pel veterinari <strong>Josep Maria Carrera</strong>, el nostre centre ha estat des de llavors un referent en la cura de les mascotes a Navarcles i rodalies.
           </p>
           <p className="text-gray-700 leading-relaxed mb-6">
             Avui, amb la mateixa passió i dedicació, el centre està dirigit per la seva filla, la veterinària <strong>Carla Carrera Gusart</strong>, acompanyada de <strong>Maria Antònia Gusart</strong>, auxiliar veterinària i responsable de la botiga i la perruqueria canina.

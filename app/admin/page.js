@@ -131,7 +131,7 @@ function Admin() {
 
         {/* Capçalera i sessió */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">\ud83d\udc69 Carla Carrera⚕️ Panell administració</h1>
+          <h1 className="text-2xl font-bold">\ud83d\udc69 Carla Carrera⚕️ Panell d&apos;administració</h1>
           <button onClick={tancarSessio} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Tancar sessió</button>
         </div>
 

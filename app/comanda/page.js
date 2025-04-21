@@ -42,7 +42,7 @@ export default function Comanda() {
     }
 
     if (formulari.enviament === "domicili" && formulari.adreca.trim() === "") {
-      toast.error("Has d'introduir una adreça per a l'enviament a domicili.");
+      toast.error("Has d&apos;introduir una adreça per a l&apos;enviament a domicili.");
       return;
     }
 
@@ -156,7 +156,7 @@ export default function Comanda() {
             <input
               type="text"
               name="adreca"
-              placeholder="Adreça d'enviament"
+              placeholder="Adreça d&apos;enviament"
               value={formulari.adreca}
               onChange={handleChange}
               required

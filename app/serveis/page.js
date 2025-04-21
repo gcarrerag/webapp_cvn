@@ -30,7 +30,7 @@ export default function Serveis() {
 
           <div className="bg-gray-50 p-6 rounded-lg shadow">
             <h2 className="text-2xl font-semibold text-green-700 mb-2">Perruqueria canina i felina</h2>
-            <p className="text-gray-700">Servei de perruqueria per mantenir la higiene i l'estètica de la teva mascota amb amor i professionalitat.</p>
+            <p className="text-gray-700">Servei de perruqueria per mantenir la higiene i l&apos;estètica de la teva mascota amb amor i professionalitat.</p>
           </div>
 
           <div className="bg-gray-50 p-6 rounded-lg shadow">
