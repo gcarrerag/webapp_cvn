@@ -313,23 +313,26 @@ function Admin() {
 		  </ul>
 
 		  <p className="text-right font-bold mt-4">
-			  Total:{" "}
-			  {(() => {
-			    try {
-			      const productesArray = JSON.parse(comanda.productes);
-			      if (Array.isArray(productesArray)) {
-				return productesArray
-				  .reduce((acc, p) => acc + (p.quantitat || 1) * parseFloat(p.preu), 0)
-				  .toFixed(2) + " €";
-			      } else {
-				return "0.00 €";
-			      }
-			    } catch (error) {
-			      console.error("Error calculant total productes:", error);
-			      return "0.00 €";
-			    }
-			  })()}
+		  Total:{" "}
+		  {(() => {
+		    try {
+		      const productesArray = JSON.parse(comanda.productes);
+		      if (Array.isArray(productesArray)) {
+			return (
+			  productesArray
+			    .reduce((acc, p) => acc + (p.quantitat || 1) * parseFloat(p.preu), 0)
+			    .toFixed(2) + " €"
+			);
+		      } else {
+			return "0.00 €";
+		      }
+		    } catch (error) {
+		      console.error("Error calculant total productes:", error);
+		      return "0.00 €";
+		    }
+		  })()}
 		</p>
+
 
 		</div>
 	      </div> {/* Tanca cada comanda */}
