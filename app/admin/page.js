@@ -2,18 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import withAuth from "../../components/WithAuth"; 
+import withAuth from "../../components/WithAuth";
 import Navbar from "../../components/Navbar";
 import * as XLSX from "xlsx";
 
 function Admin() {
   const [comandes, setComandes] = useState([]);
   const [productes, setProductes] = useState([]);
-  const [formulari, setFormulari] = useState({ 
-    nom: "", descripcio: "", preu: "", imatge: "", stock: "", animal: "", categoria: ""
-  });
+  const [formulari, setFormulari] = useState({ nom: "", descripcio: "", preu: "", imatge: "", stock: "", animal: "", categoria: "" });
   const [editantProducteId, setEditantProducteId] = useState(null);
-
   const [filtreData, setFiltreData] = useState("");
   const [filtreEstat, setFiltreEstat] = useState("tots");
   const [filtreEnviament, setFiltreEnviament] = useState("tots");
@@ -44,45 +41,33 @@ function Admin() {
   const editarPreu = async (id, preuActual, stockActual) => {
     const nouPreu = prompt("Nou preu (€):", preuActual);
     if (nouPreu !== null) {
-      try {
-        await fetch(`/api/productes/${id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ preu: nouPreu, stock: stockActual }),
-        });
-        carregarProductes();
-        setEditantProducteId(null);
-      } catch (error) {
-        console.error("Error editant preu:", error);
-      }
+      await fetch(`/api/productes/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ preu: nouPreu, stock: stockActual }),
+      });
+      carregarProductes();
+      setEditantProducteId(null);
     }
   };
 
   const editarStock = async (id, preuActual, stockActual) => {
     const nouStock = prompt("Nou stock:", stockActual);
     if (nouStock !== null) {
-      try {
-        await fetch(`/api/productes/${id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ preu: preuActual, stock: nouStock }),
-        });
-        carregarProductes();
-        setEditantProducteId(null);
-      } catch (error) {
-        console.error("Error editant stock:", error);
-      }
+      await fetch(`/api/productes/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ preu: preuActual, stock: nouStock }),
+      });
+      carregarProductes();
+      setEditantProducteId(null);
     }
   };
 
   const eliminarProducte = async (id) => {
     if (confirm("Segur que vols eliminar aquest producte?")) {
-      try {
-        await fetch(`/api/productes/${id}`, { method: "DELETE" });
-        carregarProductes();
-      } catch (error) {
-        console.error("Error eliminant producte:", error);
-      }
+      await fetch(`/api/productes/${id}`, { method: "DELETE" });
+      carregarProductes();
     }
   };
 
@@ -90,15 +75,9 @@ function Admin() {
     try {
       const resposta = await fetch("/api/comanda");
       const dades = await resposta.json();
-      if (Array.isArray(dades)) {
-        setComandes(dades);
-      } else {
-        console.error("Resposta inesperada carregant comandes:", dades);
-        setComandes([]);
-      }
+      if (Array.isArray(dades)) setComandes(dades);
     } catch (error) {
       console.error("Error carregant comandes:", error);
-      setComandes([]);
     }
   };
 
@@ -106,29 +85,19 @@ function Admin() {
     try {
       const resposta = await fetch("/api/productes");
       const dades = await resposta.json();
-      if (Array.isArray(dades)) {
-        setProductes(dades);
-      } else {
-        console.error("Resposta inesperada carregant productes:", dades);
-        setProductes([]);
-      }
+      if (Array.isArray(dades)) setProductes(dades);
     } catch (error) {
       console.error("Error carregant productes:", error);
-      setProductes([]);
     }
   };
 
   const marcarComEnviada = async (id) => {
-    try {
-      await fetch(`/api/comanda/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ estat: "enviada" }),
-      });
-      carregarComandes();
-    } catch (error) {
-      console.error("Error marcant comanda com enviada:", error);
-    }
+    await fetch(`/api/comanda/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estat: "enviada" }),
+    });
+    carregarComandes();
   };
 
   const tancarSessio = () => {
@@ -149,28 +118,32 @@ function Admin() {
   });
 
   const exportarExcel = () => {
-	  const dades = comandesFiltrades.map((c) => {
-	    const productes = JSON.parse(c.productes); // 👈 parsem correctament aquí
+    const dades = comandesFiltrades.map(c => ({
+      ID: c.id,
+      Nom: c.nom,
+      Telefon: c.telefon,
+      Adreca: c.adreca,
+      Enviament: c.enviament === "domicili" ? "Domicili" : "Recollida",
+      Estat: c.estat,
+      Data: new Date(c.data).toLocaleString(),
+      Total: (() => {
+        try {
+          const productesArray = JSON.parse(c.productes);
+          if (Array.isArray(productesArray)) {
+            return productesArray.reduce((acc, p) => acc + (p.quantitat || 1) * parseFloat(p.preu), 0).toFixed(2) + " €";
+          }
+        } catch (err) {
+          console.error("Error parsejant productes a Excel:", err);
+        }
+        return "0.00 €";
+      })()
+    }));
 
-	    return {
-	      ID: c.id,
-	      Nom: c.nom,
-	      Telefon: c.telefon,
-	      Adreca: c.adreca,
-	      Enviament: c.enviament === "domicili" ? "Domicili" : "Recollida",
-	      Estat: c.estat,
-	      Data: new Date(c.data).toLocaleString(),
-	      Total: productes
-		.reduce((acc, p) => acc + (p.quantitat || 1) * parseFloat(p.preu), 0)
-		.toFixed(2) + " €",
-	    };
-	  });
-
-	  const worksheet = XLSX.utils.json_to_sheet(dades);
-	  const workbook = XLSX.utils.book_new();
-	  XLSX.utils.book_append_sheet(workbook, worksheet, "Comandes");
-	  XLSX.writeFile(workbook, "comandes.xlsx");
-	};
+    const worksheet = XLSX.utils.json_to_sheet(dades);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Comandes");
+    XLSX.writeFile(workbook, "comandes.xlsx");
+  };
 
   
   return (  
@@ -354,25 +327,22 @@ function Admin() {
 		      } catch (error) {
 			console.error("Error calculant total productes:", error);
 			return "0.00";
-		      }
+		                    }
 		    })()}{" "}
 		    €
 		  </p>
 		</div>
-
-
-		</div>
-	      </div>
+	      </div> {/* Tanca cada comanda */}
 	    ))}
-	  </div>
+	  </div> {/* Tanca el container de totes les comandes */}
 	)}
-
-    </div>
-  );
-  
-}
+	</div> {/* Tanca el <div> general */}
+	</main> {/* Tanca el <main> */}
+	);
+	}
 
 export default withAuth(Admin); // ✅ Important: exportar protegit
+
 
 
 
