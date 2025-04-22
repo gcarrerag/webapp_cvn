@@ -3,24 +3,36 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Navbar from "../../../components/Navbar";
-import { Toaster, toast } from "react-hot-toast"; // ✅ importem el Toast
+import { Toaster, toast } from "react-hot-toast"; // ✅ Toasts de confirmació
 
 export default function Producte() {
   const { id } = useParams();
   const [producte, setProducte] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const carregarProducte = async () => {
-      const res = await fetch(`/api/productes/${id}`);
-      const data = await res.json();
-      setProducte(data);
+      try {
+        const res = await fetch(`/api/productes/${id}`);
+        if (!res.ok) {
+          throw new Error("Error carregant el producte");
+        }
+        const data = await res.json();
+        setProducte(data);
+      } catch (err) {
+        console.error("Error carregant producte:", err);
+        setError("No s'ha pogut carregar el producte.");
+      }
     };
-    carregarProducte();
+    if (id) {
+      carregarProducte();
+    }
   }, [id]);
 
   const afegirAlCarret = () => {
+    if (!producte) return;
     const carret = JSON.parse(localStorage.getItem("carret")) || [];
-    const existeix = carret.find(p => p.nom === producte.nom);
+    const existeix = carret.find(p => p.id === producte.id);
 
     if (existeix) {
       if (existeix.quantitat < producte.stock) {
@@ -38,12 +50,28 @@ export default function Producte() {
     localStorage.setItem("carret", JSON.stringify(carret));
   };
 
-  if (!producte) return <div>Carregant...</div>;
+  if (error) {
+    return (
+      <div>
+        <Navbar />
+        <main className="p-8 text-center text-red-600">{error}</main>
+      </div>
+    );
+  }
+
+  if (!producte) {
+    return (
+      <div>
+        <Navbar />
+        <main className="p-8 text-center text-gray-600">Carregant...</main>
+      </div>
+    );
+  }
 
   return (
     <div>
       <Navbar />
-      <Toaster /> {/* ✅ Afegeix el Toaster aquí un cop per veure els missatges */}
+      <Toaster />
       <main className="p-8 bg-gray-50 min-h-screen max-w-5xl mx-auto">
         <div className="flex flex-col md:flex-row gap-10 bg-white p-6 rounded shadow">
           <div className="flex-1">
@@ -82,5 +110,6 @@ export default function Producte() {
     </div>
   );
 }
+
 
 

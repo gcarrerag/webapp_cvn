@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import withAuth from "../../components/WithAuth"; // ✅ Protecció
+import withAuth from "../../components/WithAuth"; 
 import Navbar from "../../components/Navbar";
 import * as XLSX from "xlsx";
 
@@ -28,67 +28,107 @@ function Admin() {
 
   const afegirProducte = async (e) => {
     e.preventDefault();
-    await fetch("/api/productes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formulari),
-    });
-    setFormulari({ nom: "", descripcio: "", preu: "", imatge: "", stock: "", animal: "", categoria: "" });
-    carregarProductes();
+    try {
+      await fetch("/api/productes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formulari),
+      });
+      setFormulari({ nom: "", descripcio: "", preu: "", imatge: "", stock: "", animal: "", categoria: "" });
+      carregarProductes();
+    } catch (error) {
+      console.error("Error afegint producte:", error);
+    }
   };
 
   const editarPreu = async (id, preuActual, stockActual) => {
     const nouPreu = prompt("Nou preu (€):", preuActual);
     if (nouPreu !== null) {
-      await fetch(`/api/productes/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ preu: nouPreu, stock: stockActual }),
-      });
-      carregarProductes();
-      setEditantProducteId(null);
+      try {
+        await fetch(`/api/productes/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ preu: nouPreu, stock: stockActual }),
+        });
+        carregarProductes();
+        setEditantProducteId(null);
+      } catch (error) {
+        console.error("Error editant preu:", error);
+      }
     }
   };
 
   const editarStock = async (id, preuActual, stockActual) => {
     const nouStock = prompt("Nou stock:", stockActual);
     if (nouStock !== null) {
-      await fetch(`/api/productes/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ preu: preuActual, stock: nouStock }),
-      });
-      carregarProductes();
-      setEditantProducteId(null);
+      try {
+        await fetch(`/api/productes/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ preu: preuActual, stock: nouStock }),
+        });
+        carregarProductes();
+        setEditantProducteId(null);
+      } catch (error) {
+        console.error("Error editant stock:", error);
+      }
     }
   };
 
   const eliminarProducte = async (id) => {
     if (confirm("Segur que vols eliminar aquest producte?")) {
-      await fetch(`/api/productes/${id}`, { method: "DELETE" });
-      carregarProductes();
+      try {
+        await fetch(`/api/productes/${id}`, { method: "DELETE" });
+        carregarProductes();
+      } catch (error) {
+        console.error("Error eliminant producte:", error);
+      }
     }
   };
 
   const carregarComandes = async () => {
-    const resposta = await fetch("/api/comanda");
-    const dades = await resposta.json();
-    setComandes(dades);
+    try {
+      const resposta = await fetch("/api/comanda");
+      const dades = await resposta.json();
+      if (Array.isArray(dades)) {
+        setComandes(dades);
+      } else {
+        console.error("Resposta inesperada carregant comandes:", dades);
+        setComandes([]);
+      }
+    } catch (error) {
+      console.error("Error carregant comandes:", error);
+      setComandes([]);
+    }
   };
 
   const carregarProductes = async () => {
-    const resposta = await fetch("/api/productes");
-    const dades = await resposta.json();
-    setProductes(dades);
+    try {
+      const resposta = await fetch("/api/productes");
+      const dades = await resposta.json();
+      if (Array.isArray(dades)) {
+        setProductes(dades);
+      } else {
+        console.error("Resposta inesperada carregant productes:", dades);
+        setProductes([]);
+      }
+    } catch (error) {
+      console.error("Error carregant productes:", error);
+      setProductes([]);
+    }
   };
 
   const marcarComEnviada = async (id) => {
-    await fetch(`/api/comanda/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ estat: "enviada" }),
-    });
-    carregarComandes();
+    try {
+      await fetch(`/api/comanda/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estat: "enviada" }),
+      });
+      carregarComandes();
+    } catch (error) {
+      console.error("Error marcant comanda com enviada:", error);
+    }
   };
 
   const tancarSessio = () => {
@@ -98,16 +138,15 @@ function Admin() {
 
   const comandesArray = Array.isArray(comandes) ? comandes : [];
 
-	const comandesFiltrades = comandesArray.filter((c) => {
-	  const dataComanda = new Date(c.data).toISOString().split("T")[0];
-	  const compleixData = !filtreData || filtreData === dataComanda;
-	  const compleixEstat = filtreEstat === "tots" || c.estat === filtreEstat;
-	  const compleixEnviament = filtreEnviament === "tots" || c.enviament === filtreEnviament;
-	  const cercaText = filtreCerca.toLowerCase();
-	  const compleixCerca = c.nom.toLowerCase().includes(cercaText) || c.telefon.includes(cercaText);
-	  return compleixData && compleixEstat && compleixEnviament && compleixCerca;
-	});
-
+  const comandesFiltrades = comandesArray.filter((c) => {
+    const dataComanda = new Date(c.data).toISOString().split("T")[0];
+    const compleixData = !filtreData || filtreData === dataComanda;
+    const compleixEstat = filtreEstat === "tots" || c.estat === filtreEstat;
+    const compleixEnviament = filtreEnviament === "tots" || c.enviament === filtreEnviament;
+    const cercaText = filtreCerca.toLowerCase();
+    const compleixCerca = c.nom.toLowerCase().includes(cercaText) || c.telefon.includes(cercaText);
+    return compleixData && compleixEstat && compleixEnviament && compleixCerca;
+  });
 
   const exportarExcel = () => {
     const dades = comandesFiltrades.map(c => ({

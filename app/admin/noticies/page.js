@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Navbar from "../../../components/Navbar";
 import { Toaster, toast } from "react-hot-toast";
-import Editor from "../../../components/Editor"; // 👉🏻 Editor TipTap
-import withAuth from "../../../components/WithAuth"; // ✅ Importem la protecció
+import Editor from "../../../components/Editor";
+import withAuth from "../../../components/WithAuth";
 
 function AdminNoticies() {
   const [titol, setTitol] = useState("");
   const [cos, setCos] = useState("");
   const [imatge, setImatge] = useState(null);
+  const [carregant, setCarregant] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,30 +20,36 @@ function AdminNoticies() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("titol", titol);
-    formData.append("cos", cos);
-    if (imatge) {
-      formData.append("imatge", imatge);
-    }
-
     try {
+      setCarregant(true);
+
+      const formData = new FormData();
+      formData.append("titol", titol);
+      formData.append("cos", cos);
+      if (imatge) {
+        formData.append("imatge", imatge);
+      }
+
       const res = await fetch("/api/noticies", {
         method: "POST",
         body: formData,
       });
 
-      if (res.ok) {
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error("Error resposta servidor:", errorData);
+        toast.error(errorData.error || "Error en publicar notícia.");
+      } else {
         toast.success("Notícia publicada!");
         setTitol("");
         setCos("");
         setImatge(null);
-      } else {
-        toast.error("Error en publicar notícia.");
       }
     } catch (err) {
-      console.error(err);
-      toast.error("Error inesperat.");
+      console.error("Error inesperat:", err);
+      toast.error("Error inesperat en publicar.");
+    } finally {
+      setCarregant(false);
     }
   };
 
@@ -76,9 +83,10 @@ function AdminNoticies() {
 
           <button
             type="submit"
-            className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700"
+            disabled={carregant}
+            className={`bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 ${carregant ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            Publicar notícia
+            {carregant ? "Publicant..." : "Publicar notícia"}
           </button>
         </form>
       </main>
@@ -86,6 +94,5 @@ function AdminNoticies() {
   );
 }
 
-export default withAuth(AdminNoticies); // ✅ Protegim la pàgina
-
+export default withAuth(AdminNoticies);
 

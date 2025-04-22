@@ -2,14 +2,19 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar";
-import { Toaster, toast } from "react-hot-toast"; // ✅ Importem
+import { Toaster, toast } from "react-hot-toast";
 
 export default function Carret() {
   const [carret, setCarret] = useState([]);
 
   useEffect(() => {
-    const dades = JSON.parse(localStorage.getItem("carret")) || [];
-    setCarret(dades);
+    try {
+      const dades = JSON.parse(localStorage.getItem("carret")) || [];
+      setCarret(Array.isArray(dades) ? dades : []);
+    } catch (err) {
+      console.error("Error llegint carret:", err);
+      setCarret([]);
+    }
   }, []);
 
   const actualitzarCarret = (nouCarret) => {
@@ -41,11 +46,10 @@ export default function Carret() {
     } else {
       producte.quantitat = novaQuantitat;
       actualitzarCarret(nouCarret);
-      if (delta > 0) {
-        toast.success(`Has afegit una unitat més de "${producte.nom}" ✅`);
-      } else {
-        toast(`Has reduït una unitat de "${producte.nom}"`, { icon: "➖" });
-      }
+      toast.success(delta > 0
+        ? `Has afegit una unitat més de "${producte.nom}" ✅`
+        : `Has reduït una unitat de "${producte.nom}" ➖`
+      );
     }
   };
 
@@ -59,7 +63,7 @@ export default function Carret() {
   return (
     <div>
       <Navbar />
-      <Toaster /> {/* ✅ Afegeix aquest component per mostrar toasts */}
+      <Toaster />
       <main className="p-8 bg-gray-50 min-h-screen">
         <h1 className="text-2xl font-bold mb-6">🛒 El teu carret</h1>
 
@@ -96,7 +100,7 @@ export default function Carret() {
 
                   <button
                     onClick={() => eliminarProducte(index)}
-                    className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition w-full"
+                    className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full transition"
                   >
                     Eliminar
                   </button>
@@ -119,5 +123,6 @@ export default function Carret() {
     </div>
   );
 }
+
 
 
