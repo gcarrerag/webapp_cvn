@@ -19,10 +19,11 @@ export async function GET() {
 // 🟢 POST: Crear una nova notícia
 export async function POST(request) {
   try {
-    const bodyText = await request.text(); // 🔥 primer llegim com a text
-    const body = JSON.parse(bodyText);      // 🔥 després fem parse segur
+    const formData = await request.formData(); // 🔥 Llegim com a FormData
+    const titol = formData.get("titol");
+    const contingut = formData.get("cos");
+    const imatge = formData.get("imatge"); // pot ser null
 
-    const { titol, contingut, imatge } = body;
     const dataActual = new Date().toISOString();
 
     const { data, error } = await supabase
