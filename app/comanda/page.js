@@ -29,74 +29,79 @@ export default function Comanda() {
   };
 
   const enviarComanda = async (e) => {
-    e.preventDefault();
+	  e.preventDefault();
 
-    if (carret.length === 0) {
-      toast.error("El carret està buit!");
-      return;
-    }
+	  // 🛑 Si ja està carregant, sortir
+	  if (carregant) return;
 
-    if (!/^\d{9}$/.test(formulari.telefon)) {
-      toast.error("Introdueix un telèfon vàlid (9 dígits).");
-      return;
-    }
+	  setCarregant(true);
 
-    if (formulari.enviament === "domicili" && formulari.adreca.trim() === "") {
-      toast.error("Has d'introduir una adreça per a l'enviament a domicili.");
-      return;
-    }
+	  if (carret.length === 0) {
+	    toast.error("El carret està buit!");
+	    setCarregant(false);
+	    return;
+	  }
 
-    setCarregant(true);
+	  if (!/^\d{9}$/.test(formulari.telefon)) {
+	    toast.error("Introdueix un telèfon vàlid (9 dígits).");
+	    setCarregant(false);
+	    return;
+	  }
 
-    try {
-      localStorage.setItem("ultimaComanda", JSON.stringify({
-        ...formulari,
-        productes: carret,
-      }));
+	  if (formulari.enviament === "domicili" && formulari.adreca.trim() === "") {
+	    toast.error("Has d'introduir una adreça per a l'enviament a domicili.");
+	    setCarregant(false);
+	    return;
+	  }
 
-      if (formulari.metodePagament === "stripe") {
-        // 🔵 Només Stripe: no enviar comanda encara
-        const respostaStripe = await fetch("/api/stripe/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...formulari,
-            productes: carret,
-          }),
-        });
+	  try {
+	    localStorage.setItem("ultimaComanda", JSON.stringify({
+	      ...formulari,
+	      productes: carret,
+	    }));
 
-        if (respostaStripe.ok) {
-          const { url } = await respostaStripe.json();
-          window.location.href = url; // Va cap al checkout de Stripe
-        } else {
-          toast.error("Error en iniciar el pagament.");
-          setCarregant(false);
-        }
-      } else {
-        // 🟢 Si paga al local: enviar comanda ja
-        await fetch("/api/comanda", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...formulari,
-            productes: carret.map((p) => ({
-              id: p.id,
-              nom: p.nom,
-              preu: p.preu,
-              quantitat: p.quantitat,
-            })),
-          }),
-        });
+	    if (formulari.metodePagament === "stripe") {
+	      const respostaStripe = await fetch("/api/stripe/checkout", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({
+		  ...formulari,
+		  productes: carret,
+		}),
+	      });
 
-        localStorage.removeItem("carret");
-        router.push("/gracies");
-      }
-    } catch (error) {
-      console.error("Error en enviar la comanda:", error);
-      toast.error("Error inesperat.");
-      setCarregant(false);
-    }
-  };
+	      if (respostaStripe.ok) {
+		const { url } = await respostaStripe.json();
+		window.location.href = url;
+	      } else {
+		toast.error("Error en iniciar el pagament.");
+		setCarregant(false);
+	      }
+	    } else {
+	      await fetch("/api/comanda", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({
+		  ...formulari,
+		  productes: carret.map((p) => ({
+		    id: p.id,
+		    nom: p.nom,
+		    preu: p.preu,
+		    quantitat: p.quantitat,
+		  })),
+		}),
+	      });
+
+	      localStorage.removeItem("carret");
+	      router.push("/gracies");
+	    }
+	  } catch (error) {
+	    console.error("Error en enviar la comanda:", error);
+	    toast.error("Error inesperat.");
+	    setCarregant(false);
+	  }
+	};
+
 
   return (
     <div>
