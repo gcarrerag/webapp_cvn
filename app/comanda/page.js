@@ -54,7 +54,8 @@ export default function Comanda() {
         productes: carret,
       }));
 
-      if (formulari.enviament === "domicili" || formulari.metodePagament === "stripe") {
+      if (formulari.metodePagament === "stripe") {
+        // 🔵 Només Stripe: no enviar comanda encara
         const respostaStripe = await fetch("/api/stripe/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -66,12 +67,13 @@ export default function Comanda() {
 
         if (respostaStripe.ok) {
           const { url } = await respostaStripe.json();
-          window.location.href = url;
+          window.location.href = url; // Va cap al checkout de Stripe
         } else {
           toast.error("Error en iniciar el pagament.");
           setCarregant(false);
         }
       } else {
+        // 🟢 Si paga al local: enviar comanda ja
         await fetch("/api/comanda", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -85,6 +87,7 @@ export default function Comanda() {
             })),
           }),
         });
+
         localStorage.removeItem("carret");
         router.push("/gracies");
       }
@@ -100,7 +103,7 @@ export default function Comanda() {
       <Navbar />
       <Toaster />
       <main className="p-6 md:p-8 bg-gray-50 min-h-screen max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-center text-blue-800 mb-8">\ud83d\udce6 Finalitzar comanda</h1>
+        <h1 className="text-3xl font-bold text-center text-blue-800 mb-8">📦 Finalitzar comanda</h1>
 
         <form onSubmit={enviarComanda} className="grid gap-4 mb-10 bg-white p-6 rounded shadow">
           <input
@@ -122,6 +125,7 @@ export default function Comanda() {
             className="border px-4 py-2 rounded w-full placeholder-gray-500"
           />
 
+          {/* Enviament */}
           <div className="flex flex-col sm:flex-row gap-4">
             <label className="flex items-center gap-2">
               <input
@@ -145,6 +149,7 @@ export default function Comanda() {
             </label>
           </div>
 
+          {/* Adreça */}
           {formulari.enviament === "domicili" && (
             <input
               type="text"
@@ -157,6 +162,7 @@ export default function Comanda() {
             />
           )}
 
+          {/* Mètode de pagament */}
           {formulari.enviament === "recollida" && (
             <div>
               <h3 className="font-semibold mb-2 text-gray-700">Mètode de pagament</h3>
@@ -192,9 +198,10 @@ export default function Comanda() {
           </button>
         </form>
 
+        {/* Carret resum */}
         {carret.length > 0 && (
           <div className="bg-white p-6 rounded shadow">
-            <h2 className="text-2xl font-semibold mb-6 text-center">\ud83d\uded9\ufe0f Resum del carret</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-center">🛍️ Resum del carret</h2>
             <ul className="space-y-3">
               {carret.map((prod, i) => (
                 <li key={i} className="flex justify-between border-b pb-2 text-gray-700">
@@ -209,6 +216,7 @@ export default function Comanda() {
     </div>
   );
 }
+
 
 
 
