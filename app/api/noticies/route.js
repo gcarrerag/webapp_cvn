@@ -39,7 +39,7 @@ export async function POST(request) {
         return NextResponse.json({ error: "Error pujant imatge" }, { status: 500 });
       }
 
-      imatgeURL = `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/noticies/${nomArxiu}`;
+      imatgeURL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/noticies/${nomArxiu}`;
     }
 
     const dataActual = new Date().toISOString();
@@ -89,7 +89,7 @@ export async function PUT(request) {
         return NextResponse.json({ error: "Error pujant nova imatge" }, { status: 500 });
       }
 
-      imatgeURL = `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/noticies/${nomArxiu}`;
+      imatgeURL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/noticies/${nomArxiu}`;
 
       // Esborrar la imatge antiga
       if (imatgeAntiga) {
@@ -151,6 +151,7 @@ export async function DELETE(request) {
     return NextResponse.json({ error: "Error processant esborrat" }, { status: 400 });
   }
 }
+
 
 
 
