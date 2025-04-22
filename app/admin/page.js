@@ -328,8 +328,7 @@ function Admin() {
 			console.error("Error calculant total productes:", error);
 			return "0.00";
 		                    }
-		    })()}{" "}
-		    €
+		    })()}€
 		  </p>
 		</div>
 	      </div> {/* Tanca cada comanda */}
