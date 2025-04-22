@@ -14,12 +14,13 @@ export default function Gracies() {
       router.push("/");
     } else {
       setUltimaComanda(comandaGuardada);
-      localStorage.removeItem("carret"); // 🔥 Esborrem el carret aquí també per seguretat
+      localStorage.removeItem("carret");
 
-      // 🔥 ENVIAR COMANDA A TELEGRAM ara que tenim la info
-      enviarComandaATelegram(comandaGuardada);
+      // 🔥 Només enviar la comanda a Telegram si era pagament amb targeta
+      if (comandaGuardada.metodePagament === "stripe") {
+        enviarComandaATelegram(comandaGuardada);
+      }
 
-      // 🔥 Esborrem ultimaComanda després d'enviar
       localStorage.removeItem("ultimaComanda");
     }
   }, [router]);
@@ -45,7 +46,7 @@ export default function Gracies() {
   };
 
   if (!ultimaComanda) {
-    return null; // 🔥 Espera a carregar per evitar errors visuals
+    return null;
   }
 
   return (
@@ -98,8 +99,7 @@ export default function Gracies() {
                 {ultimaComanda.productes.reduce(
                   (acc, p) => acc + (p.preu * (p.quantitat || 1)),
                   0
-                ).toFixed(2)}{" "}
-                €
+                ).toFixed(2)} €
               </p>
             </div>
           </div>
