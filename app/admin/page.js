@@ -307,20 +307,46 @@ function Admin() {
 		<div className="mt-4">
 		  <h3 className="font-semibold mb-1">🛍️ Productes:</h3>
 		  <ul className="list-disc list-inside text-sm text-gray-700">
-		    {comanda.productes.map((prod, i) => (
-		      <li key={i}>
-		        {prod.nom} x {prod.quantitat || 1} —{" "}
-		        {(prod.quantitat || 1) * parseFloat(prod.preu)} €
-		      </li>
-		    ))}
+		    {(() => {
+		      try {
+			const productesArray = JSON.parse(comanda.productes);
+			if (Array.isArray(productesArray)) {
+			  return productesArray.map((prod, i) => (
+			    <li key={i}>
+			      {prod.nom} x {prod.quantitat || 1} — {(prod.quantitat || 1) * parseFloat(prod.preu)} €
+			    </li>
+			  ));
+			} else {
+			  return <li>No hi ha productes</li>;
+			}
+		      } catch (error) {
+			console.error("Error parsejant productes:", error);
+			return <li>Error carregant productes</li>;
+		      }
+		    })()}
 		  </ul>
+
 		  <p className="text-right font-bold mt-4">
 		    Total:{" "}
-		    {comanda.productes
-		      .reduce((acc, p) => acc + (p.quantitat || 1) * parseFloat(p.preu), 0)
-		      .toFixed(2)}{" "}
+		    {(() => {
+		      try {
+			const productesArray = JSON.parse(comanda.productes);
+			if (Array.isArray(productesArray)) {
+			  return productesArray
+			    .reduce((acc, p) => acc + (p.quantitat || 1) * parseFloat(p.preu), 0)
+			    .toFixed(2);
+			} else {
+			  return "0.00";
+			}
+		      } catch (error) {
+			console.error("Error calculant total productes:", error);
+			return "0.00";
+		      }
+		    })()}{" "}
 		    €
 		  </p>
+		</div>
+
 		</div>
 	      </div>
 	    ))}
