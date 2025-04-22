@@ -32,7 +32,6 @@ export default function Carret() {
   const canviarQuantitat = (index, delta) => {
     const nouCarret = [...carret];
     const producte = nouCarret[index];
-
     const stockDisponible = producte.stock || 0;
     const novaQuantitat = (producte.quantitat || 1) + delta;
 
@@ -64,25 +63,25 @@ export default function Carret() {
     <div>
       <Navbar />
       <Toaster />
-      <main className="p-8 bg-gray-50 min-h-screen">
-        <h1 className="text-2xl font-bold mb-6">🛒 El teu carret</h1>
+      <main className="p-6 md:p-8 bg-gray-50 min-h-screen max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8 text-center text-blue-800">🛒 El teu carret</h1>
 
         {carret.length === 0 ? (
-          <p className="text-gray-600">El carret està buit.</p>
+          <p className="text-center text-gray-600 mt-20">El carret està buit.</p>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {carret.map((producte, index) => (
-                <div key={index} className="bg-white rounded shadow p-4">
+                <div key={index} className="bg-white rounded-lg shadow-md hover:shadow-lg transition p-6 flex flex-col items-center text-center">
                   <img
-                    src={`/${producte.imatge}`}
+                    src={producte.imatge}
                     alt={producte.nom}
-                    className="w-full h-40 object-cover rounded mb-4"
+                    className="w-full h-48 object-cover rounded mb-4"
                   />
-                  <h2 className="text-lg font-semibold">{producte.nom}</h2>
-                  <p className="text-blue-600 font-bold">{producte.preu} €</p>
+                  <h2 className="text-lg font-bold text-gray-800 mb-1">{producte.nom}</h2>
+                  <p className="text-blue-600 font-bold mb-2">{producte.preu} €</p>
 
-                  <div className="flex items-center justify-center gap-2 mt-4">
+                  <div className="flex items-center justify-center gap-2 mb-4">
                     <button
                       onClick={() => canviarQuantitat(index, -1)}
                       className="bg-gray-300 px-3 py-1 rounded text-xl hover:bg-gray-400"
@@ -100,7 +99,7 @@ export default function Carret() {
 
                   <button
                     onClick={() => eliminarProducte(index)}
-                    className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full transition"
+                    className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded w-full transition"
                   >
                     Eliminar
                   </button>
@@ -108,11 +107,11 @@ export default function Carret() {
               ))}
             </div>
 
-            <div className="mt-10 text-center">
-              <p className="text-lg font-bold mb-4">Total: {calcularTotal()} €</p>
+            <div className="mt-12 text-center">
+              <p className="text-2xl font-bold text-green-700 mb-6">Total: {calcularTotal()} €</p>
               <a
                 href="/comanda"
-                className="inline-block bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition"
+                className="inline-block bg-green-600 hover:bg-green-700 text-white text-lg px-8 py-3 rounded-full transition"
               >
                 Finalitzar comanda
               </a>
@@ -123,6 +122,7 @@ export default function Carret() {
     </div>
   );
 }
+
 
 
 

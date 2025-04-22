@@ -41,10 +41,11 @@ export default function Productes() {
   return (
     <div>
       <Navbar />
-      <main className="min-h-screen bg-white py-8 px-6 md:px-20 flex gap-8">
-        {/* 🧹 Sidebar de Filtres */}
-        <aside className="hidden md:block w-1/4 bg-gray-50 p-6 rounded shadow h-fit">
-          <h2 className="text-2xl font-bold text-gray-700 mb-6">Filtres</h2>
+      <main className="min-h-screen bg-white py-8 px-4 md:px-20 flex flex-col md:flex-row gap-8">
+        
+        {/* 🧩 Sidebar de Filtres */}
+        <aside className="bg-gray-50 p-6 rounded shadow w-full md:w-1/4 h-fit">
+          <h2 className="text-2xl font-bold text-gray-700 mb-6 text-center md:text-left">Filtres</h2>
 
           <div className="mb-6">
             <h3 className="text-gray-600 font-semibold mb-2">Animal</h3>
@@ -79,9 +80,9 @@ export default function Productes() {
 
         {/* 🛍️ Llistat de productes */}
         <section className="flex-1">
-          <header className="mb-10">
-            <h1 className="text-4xl font-bold text-blue-800 mb-2">Productes disponibles</h1>
-            <p className="text-gray-600 text-lg">Troba el millor per a la teva mascota</p>
+          <header className="mb-10 text-center md:text-left">
+            <h1 className="text-3xl md:text-4xl font-bold text-blue-800 mb-2">Productes disponibles</h1>
+            <p className="text-gray-600 text-md md:text-lg">Troba el millor per a la teva mascota</p>
           </header>
 
           {carregant ? (
@@ -117,6 +118,7 @@ export default function Productes() {
     </div>
   );
 }
+
 
 
 

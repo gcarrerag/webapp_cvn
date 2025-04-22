@@ -42,36 +42,20 @@ export default function Comanda() {
     }
 
     if (formulari.enviament === "domicili" && formulari.adreca.trim() === "") {
-      toast.error("Has d&apos;introduir una adreça per a l&apos;enviament a domicili.");
+      toast.error("Has d'introduir una adreça per a l'enviament a domicili.");
       return;
     }
 
     setCarregant(true);
 
     try {
-      // 1. Guardar la comanda
-      await fetch("/api/comanda", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formulari,
-          productes: carret.map((p) => ({
-            id: p.id,
-            nom: p.nom,
-            preu: p.preu,
-            quantitat: p.quantitat,
-          })),
-        }),
-      });
-
-      // 2. Guardar en localStorage
       localStorage.setItem("ultimaComanda", JSON.stringify({
         ...formulari,
         productes: carret,
       }));
 
-      if (formulari.enviament === "domicili" || formulari.metodePagament === "stripe") {
-        // Pagament amb Stripe
+      if (formulari.metodePagament === "stripe") {
+        // 🔵 Si és Stripe ➔ anem a Stripe primer (no enviem encara la comanda)
         const respostaStripe = await fetch("/api/stripe/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -89,7 +73,21 @@ export default function Comanda() {
           setCarregant(false);
         }
       } else {
-        // Pagament al local ➔ redirigir a gràcies
+        // 🟢 Si és pagament al local ➔ enviem comanda ara
+        await fetch("/api/comanda", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...formulari,
+            productes: carret.map((p) => ({
+              id: p.id,
+              nom: p.nom,
+              preu: p.preu,
+              quantitat: p.quantitat,
+            })),
+          }),
+        });
+
         localStorage.removeItem("carret");
         router.push("/gracies");
       }
@@ -104,10 +102,11 @@ export default function Comanda() {
     <div>
       <Navbar />
       <Toaster />
-      <main className="p-8 bg-gray-50 min-h-screen max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">📦 Finalitzar comanda</h1>
+      <main className="p-6 md:p-8 bg-gray-50 min-h-screen max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold text-center text-blue-800 mb-8">📦 Finalitzar comanda</h1>
 
-        <form onSubmit={enviarComanda} className="grid gap-4 mb-8 bg-white p-6 rounded shadow">
+        <form onSubmit={enviarComanda} className="grid gap-4 mb-10 bg-white p-6 rounded shadow">
+          {/* Inputs */}
           <input
             type="text"
             name="nom"
@@ -115,7 +114,7 @@ export default function Comanda() {
             value={formulari.nom}
             onChange={handleChange}
             required
-            className="border px-4 py-2 rounded"
+            className="border px-4 py-2 rounded w-full"
           />
           <input
             type="tel"
@@ -124,47 +123,47 @@ export default function Comanda() {
             value={formulari.telefon}
             onChange={handleChange}
             required
-            className="border px-4 py-2 rounded"
+            className="border px-4 py-2 rounded w-full"
           />
 
-          {/* Enviament */}
-          <div className="flex gap-4">
-            <label>
+          {/* Opcions Enviament */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <label className="flex items-center gap-2">
               <input
                 type="radio"
                 name="enviament"
                 value="domicili"
                 checked={formulari.enviament === "domicili"}
                 onChange={handleChange}
-              />{" "}
+              />
               Domicili
             </label>
-            <label>
+            <label className="flex items-center gap-2">
               <input
                 type="radio"
                 name="enviament"
                 value="recollida"
                 checked={formulari.enviament === "recollida"}
                 onChange={handleChange}
-              />{" "}
+              />
               Recollida al local
             </label>
           </div>
 
-          {/* Adreça si domicili */}
+          {/* Adreça */}
           {formulari.enviament === "domicili" && (
             <input
               type="text"
               name="adreca"
-              placeholder="Adreça d&apos;enviament"
+              placeholder="Adreça d'enviament"
               value={formulari.adreca}
               onChange={handleChange}
               required
-              className="border px-4 py-2 rounded"
+              className="border px-4 py-2 rounded w-full"
             />
           )}
 
-          {/* Mètode de pagament si recollida */}
+          {/* Mètode pagament */}
           {formulari.enviament === "recollida" && (
             <div>
               <h3 className="font-semibold mb-2 text-gray-700">Mètode de pagament</h3>
@@ -185,14 +184,15 @@ export default function Comanda() {
             placeholder="Observacions (opcional)"
             value={formulari.observacions}
             onChange={handleChange}
-            className="border px-4 py-2 rounded"
+            className="border px-4 py-2 rounded w-full"
+            rows={3}
           ></textarea>
 
-          {/* Botó enviar */}
+          {/* Botó */}
           <button
             type="submit"
             disabled={carregant}
-            className={`py-2 px-4 rounded transition ${
+            className={`py-3 px-6 rounded-full font-bold transition ${
               carregant ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700 text-white"
             }`}
           >
@@ -200,15 +200,15 @@ export default function Comanda() {
           </button>
         </form>
 
-        {/* Carret resum */}
+        {/* Resum Carret */}
         {carret.length > 0 && (
           <div className="bg-white p-6 rounded shadow">
-            <h2 className="text-xl font-semibold mb-4">🛍️ Resum del carret</h2>
-            <ul className="space-y-2">
+            <h2 className="text-2xl font-semibold mb-6 text-center">🛍️ Resum del carret</h2>
+            <ul className="space-y-3">
               {carret.map((prod, i) => (
-                <li key={i} className="flex justify-between border-b pb-2">
+                <li key={i} className="flex justify-between border-b pb-2 text-gray-700">
                   <span>{prod.nom} x {prod.quantitat || 1}</span>
-                  <span className="font-semibold">{(prod.preu * (prod.quantitat || 1)).toFixed(2)} €</span>
+                  <span className="font-bold">{(prod.preu * (prod.quantitat || 1)).toFixed(2)} €</span>
                 </li>
               ))}
             </ul>
@@ -218,6 +218,7 @@ export default function Comanda() {
     </div>
   );
 }
+
 
 
 
