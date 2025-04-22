@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
-import supabase from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
+
+// Supabase admin per coses generals (sense auth)
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 // 🔥 Funció per enviar missatge a Telegram
 async function enviarMissatgeTelegram(missatge) {
-  const token = "8046559054:AAFn2dismbKNVJ1JHzglZlan3sQ7EaQyVjs"; // 🔴 (idealment a env)
-  const chatId = "5495392505";
+  const token = process.env.TELEGRAM_TOKEN; // 🔥 Idealment a env
+  const chatId = process.env.TELEGRAM_CHAT_ID;
   const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(missatge)}`;
 
   try {
@@ -21,9 +27,9 @@ async function enviarMissatgeTelegram(missatge) {
 }
 
 // 🔵 GET: Llistar totes les comandes
-export async function GET() {
+export async function GET(request) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from("comandes")
       .select("*")
       .order("id", { ascending: false });
@@ -43,6 +49,13 @@ export async function GET() {
 // 🟢 POST: Crear una nova comanda
 export async function POST(request) {
   try {
+    const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      { global: { headers: { Authorization: `Bearer ${token}` } } }
+    );
+
     const { nom, telefon, adreca, observacions, enviament, productes } = await request.json();
     const dataActual = new Date().toISOString();
 
@@ -114,6 +127,7 @@ export async function POST(request) {
     return NextResponse.json({ error: "Error inesperat" }, { status: 500 });
   }
 }
+
 
 
 

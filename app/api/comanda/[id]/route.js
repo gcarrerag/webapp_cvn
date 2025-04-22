@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import supabase from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 
 // 🟡 PUT: Actualitzar estat d'una comanda
 export async function PUT(request, { params }) {
@@ -7,6 +7,17 @@ export async function PUT(request, { params }) {
     const { id } = params;
     const { estat } = await request.json();
 
+    // 🔥 Agafem el token de la sessió
+    const token = request.headers.get("Authorization")?.replace("Bearer ", "");
+
+    // 🔥 Creem una instància de Supabase amb aquest token
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      { global: { headers: { Authorization: `Bearer ${token}` } } }
+    );
+
+    // 🔥 Actualitzem l'estat de la comanda
     const { error } = await supabase
       .from("comandes")
       .update({ estat })
