@@ -157,8 +157,8 @@ function Admin() {
       Enviament: c.enviament === "domicili" ? "Domicili" : "Recollida",
       Estat: c.estat,
       Data: new Date(c.data).toLocaleString(),
-      Total: JSON.parse(c.productes).reduce((acc, p) => acc + (p.quantitat || 1) * parseFloat(p.preu), 0).toFixed(2) + " €"
-    }));
+      Total: (c.productes.reduce((acc, p) => acc + (p.quantitat || 1) * parseFloat(p.preu), 		0)).toFixed(2) + " €"
+	}));
 
     const worksheet = XLSX.utils.json_to_sheet(dades);
     const workbook = XLSX.utils.book_new();
@@ -307,7 +307,7 @@ function Admin() {
 		<div className="mt-4">
 		  <h3 className="font-semibold mb-1">🛍️ Productes:</h3>
 		  <ul className="list-disc list-inside text-sm text-gray-700">
-		    {JSON.parse(comanda.productes).map((prod, i) => (
+		    {comanda.productes.map((prod, i) => (
 		      <li key={i}>
 		        {prod.nom} x {prod.quantitat || 1} —{" "}
 		        {(prod.quantitat || 1) * parseFloat(prod.preu)} €
@@ -316,7 +316,7 @@ function Admin() {
 		  </ul>
 		  <p className="text-right font-bold mt-4">
 		    Total:{" "}
-		    {JSON.parse(comanda.productes)
+		    {comanda.productes
 		      .reduce((acc, p) => acc + (p.quantitat || 1) * parseFloat(p.preu), 0)
 		      .toFixed(2)}{" "}
 		    €
