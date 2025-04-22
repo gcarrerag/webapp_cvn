@@ -83,7 +83,9 @@ export default function Producte() {
           </div>
 
           <div className="flex-1 flex flex-col justify-center">
-            <h1 className="text-2xl font-bold mb-4">{producte.nom}</h1>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 mb-4 text-center md:text-left">
+	  	{producte.nom}
+	    </h1>
             <p className="text-gray-600 mb-2">{producte.descripcio}</p>
             <p className="text-green-700 text-xl font-semibold mb-2">{producte.preu} €</p>
 
