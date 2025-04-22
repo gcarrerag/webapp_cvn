@@ -9,18 +9,18 @@ export async function GET() {
       .select("*");
 
     if (error) {
-      console.error("Error obtenint productes:", error.message);
+      console.error("❌ Error Supabase GET productes:", error); // 👈🏻 MOSTREM TOT L'OBJECTE D'ERROR
       return NextResponse.json({ error: "Error obtenint productes" }, { status: 500 });
     }
 
     if (!Array.isArray(data)) {
-      console.error("Dades no són array:", data);
+      console.error("❌ Dades no són array:", data);
       return NextResponse.json({ error: "Dades incorrectes de productes" }, { status: 500 });
     }
 
     return NextResponse.json(data);
   } catch (err) {
-    console.error("Error inesperat GET productes:", err.message);
+    console.error("❌ Error inesperat GET productes:", err.message);
     return NextResponse.json({ error: "Error inesperat en obtenir productes" }, { status: 500 });
   }
 }
@@ -36,13 +36,13 @@ export async function POST(request) {
       .insert([{ nom, descripcio, preu, imatge, stock, animal, categoria }]);
 
     if (error) {
-      console.error("Error afegint producte:", error.message);
+      console.error("❌ Error Supabase POST producte:", error); // 👈🏻 MOSTREM TOT L'OBJECTE D'ERROR
       return NextResponse.json({ error: "Error afegint producte" }, { status: 500 });
     }
 
     return NextResponse.json({ missatge: "Producte afegit ✅" });
   } catch (err) {
-    console.error("Error inesperat POST productes:", err.message);
+    console.error("❌ Error inesperat POST productes:", err.message);
     return NextResponse.json({ error: "Error inesperat en afegir producte" }, { status: 500 });
   }
 }
