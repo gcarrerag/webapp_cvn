@@ -44,7 +44,7 @@ export default function Noticies() {
               <div key={noticia.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
                 {noticia.imatge && (
                   <img
-                    src={`/${noticia.imatge}`}
+                    src={noticia.imatge} // ✅ Ara correcte, sense la `/`
                     alt={noticia.titol}
                     className="w-full h-56 object-cover"
                   />
@@ -54,7 +54,6 @@ export default function Noticies() {
                   <p className="text-gray-600 text-sm mb-4">
                     {new Date(noticia.data).toLocaleDateString()}
                   </p>
-                  
                   <div
                     className="text-gray-700 text-sm leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: noticia.contingut }}
@@ -68,4 +67,5 @@ export default function Noticies() {
     </div>
   );
 }
+
 
