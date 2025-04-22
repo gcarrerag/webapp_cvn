@@ -1,21 +1,29 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+// Supabase admin per operacions sense auth
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
+
 // 🟡 PUT: Actualitzar estat d'una comanda
 export async function PUT(request, { params }) {
   try {
     const { id } = params;
     const { estat } = await request.json();
 
-    // 🔥 Agafem el token de la sessió
+    // 🔥 Agafem el token si existeix
     const token = request.headers.get("Authorization")?.replace("Bearer ", "");
 
-    // 🔥 Creem una instància de Supabase amb aquest token
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      { global: { headers: { Authorization: `Bearer ${token}` } } }
-    );
+    // 🔥 Creem instància de Supabase
+    const supabase = token
+      ? createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+          { global: { headers: { Authorization: `Bearer ${token}` } } }
+        )
+      : supabaseAdmin; // Si no hi ha token, usem admin
 
     // 🔥 Actualitzem l'estat de la comanda
     const { error } = await supabase
