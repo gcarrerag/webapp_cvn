@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Supabase admin per coses generals (sense auth)
+// 🛠️ Supabase admin per operacions generals (sense auth obligatori)
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -9,7 +9,7 @@ const supabaseAdmin = createClient(
 
 // 🔥 Funció per enviar missatge a Telegram
 async function enviarMissatgeTelegram(missatge) {
-  const token = process.env.TELEGRAM_TOKEN; // 🔥 Idealment a env
+  const token = process.env.TELEGRAM_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
   const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(missatge)}`;
 
@@ -50,11 +50,14 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const token = request.headers.get("Authorization")?.replace("Bearer ", "");
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      { global: { headers: { Authorization: `Bearer ${token}` } } }
-    );
+
+    const supabase = token
+      ? createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+          { global: { headers: { Authorization: `Bearer ${token}` } } }
+        )
+      : supabaseAdmin;
 
     const { nom, telefon, adreca, observacions, enviament, productes } = await request.json();
     const dataActual = new Date().toISOString();
@@ -127,6 +130,7 @@ export async function POST(request) {
     return NextResponse.json({ error: "Error inesperat" }, { status: 500 });
   }
 }
+
 
 
 
