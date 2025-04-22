@@ -6,6 +6,12 @@ import withAuth from "../../components/WithAuth";
 import Navbar from "../../components/Navbar";
 import * as XLSX from "xlsx";
 
+import { createClient } from "@supabase/supabase-js";
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
+
 function Admin() {
   const [comandes, setComandes] = useState([]);
   const [productes, setProductes] = useState([]);
@@ -100,10 +106,14 @@ function Admin() {
     carregarComandes();
   };
 
-  const tancarSessio = () => {
-    localStorage.removeItem("adminLogat");
-    window.location.href = "/login";
-  };
+  const tancarSessio = async () => {
+  	const { error } = await supabase.auth.signOut();
+  	if (error) {
+  	  console.error("Error tancant sessió:", error);
+ 	 } else {
+    	window.location.href = "/login";
+  	}
+	};
 
   const comandesFiltrades = comandes.filter((c) => {
     const dataComanda = new Date(c.data).toISOString().split("T")[0];

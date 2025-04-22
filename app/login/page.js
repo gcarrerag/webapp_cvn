@@ -1,12 +1,16 @@
 "use client";
 
 import { Suspense } from "react";
-import LoginForm from "./LoginForm"; // (ara veuràs avall què és LoginForm)
+import dynamic from "next/dynamic";
+
+// 🔥 Carreguem el LoginForm dinàmicament amb "ssr: false" perquè utilitza localStorage i Supabase
+const LoginForm = dynamic(() => import("./LoginForm"), { ssr: false });
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div>Carregant login...</div>}>
+    <Suspense fallback={<div>🔒 Carregant login...</div>}>
       <LoginForm />
     </Suspense>
   );
 }
+

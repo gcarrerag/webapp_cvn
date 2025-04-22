@@ -5,6 +5,12 @@ import Navbar from "../../../components/Navbar";
 import { Toaster, toast } from "react-hot-toast";
 import Editor from "../../../components/Editor";
 import withAuth from "../../../components/WithAuth";
+import { createClient } from "@supabase/supabase-js"; // 🔥 Importa supabase
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 function AdminNoticies() {
   const [titol, setTitol] = useState("");
@@ -50,7 +56,7 @@ function AdminNoticies() {
         formData.append("imatgeAntiga", imatgeAntiga);
       }
 
-      const url = "/api/noticies";  // ✅ sempre aquesta
+      const url = "/api/noticies";
       const method = editantId ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -110,12 +116,31 @@ function AdminNoticies() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const tancarSessio = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error tancant sessió:", error);
+    } else {
+      window.location.href = "/login"; // 🔥 Redireccionem a login
+    }
+  };
+
   return (
     <div>
       <Navbar />
       <Toaster />
 
       <main className="max-w-5xl mx-auto p-8">
+        {/* Botó per tancar sessió */}
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={tancarSessio}
+            className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded"
+          >
+            Tancar sessió
+          </button>
+        </div>
+
         <h1 className="text-3xl font-bold text-center mb-8">
           {editantId ? "✏️ Editar notícia" : "📰 Crear nova notícia"}
         </h1>
@@ -193,6 +218,7 @@ function AdminNoticies() {
 }
 
 export default withAuth(AdminNoticies);
+
 
 
 

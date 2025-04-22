@@ -1,8 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; 
+import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "../../components/Navbar";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 export default function LoginForm() {
   const router = useRouter();
@@ -11,22 +17,28 @@ export default function LoginForm() {
   const [clau, setClau] = useState("");
 
   useEffect(() => {
-    const sessio = localStorage.getItem("adminLogat");
-    if (sessio === "true") {
-      const redirect = searchParams.get("redirect") || "/admin";
-      router.push(redirect);
-    }
+    const comprovarSessio = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const redirect = searchParams.get("redirect") || "/admin";
+        router.push(redirect);
+      }
+    };
+    comprovarSessio();
   }, [router, searchParams]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const { error } = await supabase.auth.signInWithPassword({
+      email: usuari,
+      password: clau,
+    });
 
-    if (usuari === "admin" && clau === "1234") {
-      localStorage.setItem("adminLogat", "true");
+    if (error) {
+      alert("Usuari o contrasenya incorrectes!");
+    } else {
       const redirect = searchParams.get("redirect") || "/admin";
       router.push(redirect);
-    } else {
-      alert("Usuari o contrasenya incorrectes!");
     }
   };
 
@@ -41,8 +53,8 @@ export default function LoginForm() {
           <h1 className="text-2xl font-bold text-center">🔐 Inici de sessió</h1>
 
           <input
-            type="text"
-            placeholder="Usuari"
+            type="email"
+            placeholder="Correu electrònic"
             value={usuari}
             onChange={(e) => setUsuari(e.target.value)}
             className="w-full border px-4 py-2 rounded"
@@ -69,3 +81,4 @@ export default function LoginForm() {
     </div>
   );
 }
+
