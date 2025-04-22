@@ -149,22 +149,29 @@ function Admin() {
   });
 
   const exportarExcel = () => {
-    const dades = comandesFiltrades.map(c => ({
-      ID: c.id,
-      Nom: c.nom,
-      Telefon: c.telefon,
-      Adreca: c.adreca,
-      Enviament: c.enviament === "domicili" ? "Domicili" : "Recollida",
-      Estat: c.estat,
-      Data: new Date(c.data).toLocaleString(),
-      Total: (c.productes.reduce((acc, p) => acc + (p.quantitat || 1) * parseFloat(p.preu), 		0)).toFixed(2) + " €"
-	}));
+	  const dades = comandesFiltrades.map((c) => {
+	    const productes = JSON.parse(c.productes); // 👈 parsem correctament aquí
 
-    const worksheet = XLSX.utils.json_to_sheet(dades);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Comandes");
-    XLSX.writeFile(workbook, "comandes.xlsx");
-  };
+	    return {
+	      ID: c.id,
+	      Nom: c.nom,
+	      Telefon: c.telefon,
+	      Adreca: c.adreca,
+	      Enviament: c.enviament === "domicili" ? "Domicili" : "Recollida",
+	      Estat: c.estat,
+	      Data: new Date(c.data).toLocaleString(),
+	      Total: productes
+		.reduce((acc, p) => acc + (p.quantitat || 1) * parseFloat(p.preu), 0)
+		.toFixed(2) + " €",
+	    };
+	  });
+
+	  const worksheet = XLSX.utils.json_to_sheet(dades);
+	  const workbook = XLSX.utils.book_new();
+	  XLSX.utils.book_append_sheet(workbook, worksheet, "Comandes");
+	  XLSX.writeFile(workbook, "comandes.xlsx");
+	};
+
   
   return (  
     <div>
@@ -346,6 +353,7 @@ function Admin() {
 		    €
 		  </p>
 		</div>
+
 
 		</div>
 	      </div>
