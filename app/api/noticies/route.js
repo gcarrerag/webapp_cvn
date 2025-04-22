@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+iimport { NextResponse } from "next/server";
 import supabase from "@/lib/supabase";
 
 // 🔵 GET: Llistar totes les notícies
@@ -34,7 +34,7 @@ export async function POST(request) {
         .from("noticies")
         .upload(nomArxiu, imatge, {
           cacheControl: "3600",
-          upsert: false
+          upsert: false,
         });
 
       if (storageError) {
@@ -82,7 +82,7 @@ export async function DELETE(request) {
 
       if (storageError) {
         console.error("Error esborrant imatge de Storage:", storageError);
-        // Seguim igualment esborrant la notícia encara que falli la imatge
+        // Seguim igualment esborrant la notícia
       }
     }
 
@@ -103,4 +103,66 @@ export async function DELETE(request) {
     return NextResponse.json({ error: "Error processant esborrat" }, { status: 400 });
   }
 }
+
+// ✏️ PUT: Editar una notícia
+export async function PUT(request) {
+  try {
+    const formData = await request.formData();
+    const id = formData.get("id");
+    const titol = formData.get("titol");
+    const cos = formData.get("cos");
+    const imatge = formData.get("imatge");
+    const imatgeAntiga = formData.get("imatgeAntiga");
+
+    let imatgeURL = imatgeAntiga;
+
+    if (imatge && imatge.size > 0) {
+      // Esborrem la imatge antiga
+      if (imatgeAntiga) {
+        const parts = imatgeAntiga.split("/");
+        const nomArxiuAntic = parts[parts.length - 1];
+
+        await supabase
+          .storage
+          .from("noticies")
+          .remove([nomArxiuAntic]);
+      }
+
+      // Pugem la nova
+      const nomArxiuNou = `${Date.now()}_${imatge.name}`;
+
+      const { data: storageData, error: storageError } = await supabase
+        .storage
+        .from("noticies")
+        .upload(nomArxiuNou, imatge, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (storageError) {
+        console.error("Error pujant nova imatge:", storageError);
+        return NextResponse.json({ error: "Error pujant nova imatge" }, { status: 500 });
+      }
+
+      imatgeURL = `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/noticies/${nomArxiuNou}`;
+    }
+
+    // 🔥 Actualitzem la notícia
+    const { error } = await supabase
+      .from("noticies")
+      .update({ titol, contingut: cos, imatge: imatgeURL })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error actualitzant notícia:", error);
+      return NextResponse.json({ error: "Error actualitzant notícia" }, { status: 500 });
+    }
+
+    return NextResponse.json({ missatge: "Notícia actualitzada ✅" });
+  } catch (error) {
+    console.error("Error processant actualització:", error);
+    return NextResponse.json({ error: "Error processant actualització" }, { status: 400 });
+  }
+}
+
 

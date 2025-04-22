@@ -1,5 +1,3 @@
-// Aquí tens el teu codi completat amb la funcionalitat d'editar notícies!
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -46,7 +44,13 @@ function AdminNoticies() {
       formData.append("cos", cos);
       if (imatge) formData.append("imatge", imatge);
 
-      const url = editantId ? `/api/noticies/${editantId}` : "/api/noticies";
+      if (editantId) {
+        formData.append("id", editantId);
+        const imatgeAntiga = noticies.find((n) => n.id === editantId)?.imatge || "";
+        formData.append("imatgeAntiga", imatgeAntiga);
+      }
+
+      const url = "/api/noticies";  // ✅ sempre aquesta
       const method = editantId ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -189,5 +193,6 @@ function AdminNoticies() {
 }
 
 export default withAuth(AdminNoticies);
+
 
 
