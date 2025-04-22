@@ -98,13 +98,24 @@ function Admin() {
   };
 
   const marcarComEnviada = async (id) => {
-    await fetch(`/api/comanda/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ estat: "enviada" }),
-    });
-    carregarComandes();
-  };
+	  const { data: { session } } = await supabase.auth.getSession();
+	  
+	  if (!session) {
+	    console.error("No hi ha sessió activa!");
+	    return;
+	  }
+
+	  await fetch(`/api/comanda/${id}`, {
+	    method: "PUT",
+	    headers: {
+	      "Content-Type": "application/json",
+	      "Authorization": `Bearer ${session.access_token}`, // 🔥 Aquí passem el token!
+	    },
+	    body: JSON.stringify({ estat: "enviada" }),
+	  });
+
+	  carregarComandes();
+	};
 
   const tancarSessio = async () => {
   	const { error } = await supabase.auth.signOut();
