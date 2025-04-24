@@ -1,117 +1,257 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import Navbar from "../../../components/Navbar";
-import { Toaster, toast } from "react-hot-toast"; // ✅ Toasts de confirmació
+import { useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
+import { Toaster, toast } from "react-hot-toast"
+import Navbar from "../../../components/Navbar"
+import { ArrowLeft, ShoppingCart, Package, AlertCircle, Check, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export default function Producte() {
-  const { id } = useParams();
-  const [producte, setProducte] = useState(null);
-  const [error, setError] = useState(null);
+  const { id } = useParams()
+  const router = useRouter()
+  const [producte, setProducte] = useState(null)
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [addingToCart, setAddingToCart] = useState(false)
 
   useEffect(() => {
     const carregarProducte = async () => {
       try {
-        const res = await fetch(`/api/productes/${id}`);
+        setLoading(true)
+        const res = await fetch(`/api/productes/${id}`)
         if (!res.ok) {
-          throw new Error("Error carregant el producte");
+          throw new Error("Error carregant el producte")
         }
-        const data = await res.json();
-        setProducte(data);
+        const data = await res.json()
+        setProducte(data)
       } catch (err) {
-        console.error("Error carregant producte:", err);
-        setError("No s'ha pogut carregar el producte.");
+        console.error("Error carregant producte:", err)
+        setError("No s'ha pogut carregar el producte.")
+      } finally {
+        setLoading(false)
       }
-    };
-    if (id) {
-      carregarProducte();
     }
-  }, [id]);
+
+    if (id) {
+      carregarProducte()
+    }
+  }, [id])
 
   const afegirAlCarret = () => {
-    if (!producte) return;
-    const carret = JSON.parse(localStorage.getItem("carret")) || [];
-    const existeix = carret.find(p => p.id === producte.id);
+    if (!producte) return
 
-    if (existeix) {
-      if (existeix.quantitat < producte.stock) {
-        existeix.quantitat++;
-        toast.success("Afegit una altra unitat! ✅");
-      } else {
-        toast.error(`Només queden ${producte.stock} unitats disponibles ❌`);
-        return;
+    setAddingToCart(true)
+
+    setTimeout(() => {
+      try {
+        const carret = JSON.parse(localStorage.getItem("carret")) || []
+        const existeix = carret.find((p) => p.id === producte.id)
+
+        if (existeix) {
+          if (existeix.quantitat < producte.stock) {
+            existeix.quantitat++
+            toast.success("Afegit una altra unitat! ✅")
+          } else {
+            toast.error(`Només queden ${producte.stock} unitats disponibles ❌`)
+            setAddingToCart(false)
+            return
+          }
+        } else {
+          carret.push({ ...producte, quantitat: 1 })
+          toast.success("Producte afegit al carret! 🛒")
+        }
+
+        localStorage.setItem("carret", JSON.stringify(carret))
+      } catch (err) {
+        toast.error("Error afegint al carret")
+        console.error(err)
+      } finally {
+        setAddingToCart(false)
       }
-    } else {
-      carret.push({ ...producte, quantitat: 1 });
-      toast.success("Producte afegit al carret! 🛒");
+    }, 600) // Pequeña demora para mostrar la animación
+  }
+
+  // Función para obtener el color de badge según la categoría
+  const getCategoryColor = (categoria) => {
+    switch (categoria) {
+      case "menjar":
+        return "bg-emerald-100 text-emerald-800 hover:bg-emerald-100"
+      case "snacks":
+        return "bg-amber-100 text-amber-800 hover:bg-amber-100"
+      case "cosmetica":
+        return "bg-purple-100 text-purple-800 hover:bg-purple-100"
+      case "accessoris":
+        return "bg-blue-100 text-blue-800 hover:bg-blue-100"
+      default:
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100"
     }
+  }
 
-    localStorage.setItem("carret", JSON.stringify(carret));
-  };
+  // Función para obtener el color de badge según el animal
+  const getAnimalColor = (animal) => {
+    switch (animal) {
+      case "gos":
+        return "bg-sky-100 text-sky-800 hover:bg-sky-100"
+      case "gat":
+        return "bg-orange-100 text-orange-800 hover:bg-orange-100"
+      default:
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100"
+    }
+  }
 
+  // Estado de carga
+  if (loading) {
+    return (
+      <div>
+        <Navbar />
+        <div className="container mx-auto py-20 flex flex-col items-center justify-center">
+          <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
+          <p className="text-gray-600 text-lg">Carregant producte...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Estado de error
   if (error) {
     return (
       <div>
         <Navbar />
-        <main className="p-8 text-center text-red-600">{error}</main>
+        <div className="container mx-auto py-10 px-4">
+          <Alert variant="destructive" className="max-w-xl mx-auto">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+          <div className="flex justify-center mt-6">
+            <Button variant="outline" onClick={() => router.back()}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Tornar enrere
+            </Button>
+          </div>
+        </div>
       </div>
-    );
+    )
   }
 
   if (!producte) {
-    return (
-      <div>
-        <Navbar />
-        <main className="p-8 text-center text-gray-600">Carregant...</main>
-      </div>
-    );
+    return null // Evitar renderizado si no hay producto
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <Toaster />
-      <main className="p-8 bg-gray-50 min-h-screen max-w-5xl mx-auto">
-        <div className="flex flex-col md:flex-row gap-10 bg-white p-6 rounded shadow">
-          <div className="flex-1">
-            <img
-              src={`/${producte.imatge}`}
-              alt={producte.nom}
-              className="w-full h-80 object-cover rounded"
-            />
-          </div>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#363636",
+            color: "#fff",
+          },
+        }}
+      />
 
-          <div className="flex-1 flex flex-col justify-center">
-            <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 mb-4 text-center md:text-left">
-	  	{producte.nom}
-	    </h1>
-            <p className="text-gray-600 mb-2">{producte.descripcio}</p>
-            <p className="text-green-700 text-xl font-semibold mb-2">{producte.preu} €</p>
+      <div className="container mx-auto py-8 px-4">
+        <Button variant="ghost" className="mb-6" onClick={() => router.back()}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Tornar a productes
+        </Button>
 
-            {producte.stock > 0 ? (
-              <p className="text-sm text-gray-700 mb-4">Stock disponible: {producte.stock}</p>
-            ) : (
-              <p className="text-sm text-red-600 font-semibold mb-4">Sense stock</p>
-            )}
+        <Card className="overflow-hidden">
+          <CardContent className="p-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+              {/* Imagen del producto */}
+              <div className="relative h-[300px] md:h-full bg-gray-100">
+                <img
+		  src={`/${producte.imatge}` || "/placeholder.svg"}
+		  alt={producte.nom}
+		  className="w-full h-full object-cover"
+		/>
 
-            <button
-              onClick={afegirAlCarret}
-              disabled={producte.stock === 0}
-              className={`py-3 px-6 rounded font-bold transition ${
-                producte.stock > 0
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-gray-400 text-white cursor-not-allowed"
-              }`}
-            >
-              {producte.stock > 0 ? "Afegir al carret" : "Sense stock"}
-            </button>
-          </div>
-        </div>
-      </main>
+                <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                  {producte.animal && (
+                    <Badge variant="secondary" className={getAnimalColor(producte.animal)}>
+                      {producte.animal}
+                    </Badge>
+                  )}
+                  {producte.categoria && (
+                    <Badge variant="secondary" className={getCategoryColor(producte.categoria)}>
+                      {producte.categoria}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              {/* Detalles del producto */}
+              <div className="p-6 md:p-8 flex flex-col">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{producte.nom}</h1>
+
+                <div className="flex items-center gap-2 mb-4">
+                  {producte.stock > 0 ? (
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                      <Check className="mr-1 h-3 w-3" /> En stock
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                      <AlertCircle className="mr-1 h-3 w-3" /> Sense stock
+                    </Badge>
+                  )}
+                </div>
+
+                <p className="text-3xl font-bold text-gray-900 mb-2">{producte.preu} €</p>
+
+                <Separator className="my-4" />
+
+                <div className="mb-6 flex-grow">
+                  <h2 className="text-sm font-medium text-gray-500 mb-2">Descripció</h2>
+                  <p className="text-gray-700">{producte.descripcio}</p>
+                </div>
+
+                {producte.stock > 0 && (
+                  <div className="flex items-center gap-2 mb-4">
+                    <Package className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm text-gray-600">
+                      {producte.stock} {producte.stock === 1 ? "unitat disponible" : "unitats disponibles"}
+                    </span>
+                  </div>
+                )}
+
+                <Button
+                  onClick={afegirAlCarret}
+                  disabled={producte.stock === 0 || addingToCart}
+                  className="w-full"
+                  size="lg"
+                >
+                  {addingToCart ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Afegint...
+                    </>
+                  ) : producte.stock > 0 ? (
+                    <>
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      Afegir al carret
+                    </>
+                  ) : (
+                    "Sense stock"
+                  )}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
-  );
+  )
 }
+
+
 
 
 

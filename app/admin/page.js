@@ -1,147 +1,269 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import withAuth from "../../components/WithAuth";
-import Navbar from "../../components/Navbar";
-import * as XLSX from "xlsx";
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import withAuth from "../../components/WithAuth"
+import Navbar from "../../components/Navbar"
+import * as XLSX from "xlsx"
+import { motion } from "framer-motion"
+import {
+  Package,
+  ShoppingCart,
+  Search,
+  Calendar,
+  Filter,
+  Download,
+  Edit,
+  Trash2,
+  LogOut,
+  Save,
+  X,
+  Plus,
+  CheckCircle,
+  Clock,
+  Home,
+  Truck,
+  AlertTriangle,
+} from "lucide-react"
 
-import { createClient } from "@supabase/supabase-js";
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { createClient } from "@supabase/supabase-js"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { toast, Toaster } from "react-hot-toast"
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
 function Admin() {
-  const [comandes, setComandes] = useState([]);
-  const [productes, setProductes] = useState([]);
-  const [formulari, setFormulari] = useState({ nom: "", descripcio: "", preu: "", imatge: "", stock: "", animal: "", categoria: "" });
-  const [editantProducteId, setEditantProducteId] = useState(null);
-  const [filtreData, setFiltreData] = useState("");
-  const [filtreEstat, setFiltreEstat] = useState("tots");
-  const [filtreEnviament, setFiltreEnviament] = useState("tots");
-  const [filtreCerca, setFiltreCerca] = useState("");
+  const router = useRouter()
+  const [comandes, setComandes] = useState([])
+  const [productes, setProductes] = useState([])
+  const [formulari, setFormulari] = useState({
+    nom: "",
+    descripcio: "",
+    preu: "",
+    imatge: "",
+    stock: "",
+    animal: "",
+    categoria: "",
+  })
+  const [editantProducteId, setEditantProducteId] = useState(null)
+  const [filtreData, setFiltreData] = useState("")
+  const [filtreEstat, setFiltreEstat] = useState("tots")
+  const [filtreEnviament, setFiltreEnviament] = useState("tots")
+  const [filtreCerca, setFiltreCerca] = useState("")
+  const [activeTab, setActiveTab] = useState("productes")
+  const [loading, setLoading] = useState(true)
+  const [confirmDelete, setConfirmDelete] = useState(null)
+  const [editMode, setEditMode] = useState({
+    id: null,
+    field: null,
+    value: "",
+  })
 
   useEffect(() => {
-    carregarComandes();
-    carregarProductes();
-  }, []);
+    const loadData = async () => {
+      setLoading(true)
+      await Promise.all([carregarComandes(), carregarProductes()])
+      setLoading(false)
+    }
+    loadData()
+  }, [])
 
-  const handleChange = (e) => setFormulari({ ...formulari, [e.target.name]: e.target.value });
+  const handleChange = (e) => setFormulari({ ...formulari, [e.target.name]: e.target.value })
 
   const afegirProducte = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      await fetch("/api/productes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formulari),
-      });
-      setFormulari({ nom: "", descripcio: "", preu: "", imatge: "", stock: "", animal: "", categoria: "" });
-      carregarProductes();
+      toast.promise(
+        fetch("/api/productes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formulari),
+        }),
+        {
+          loading: "Afegint producte...",
+          success: "Producte afegit correctament!",
+          error: "Error afegint producte",
+        },
+      )
+      setFormulari({ nom: "", descripcio: "", preu: "", imatge: "", stock: "", animal: "", categoria: "" })
+      setTimeout(() => carregarProductes(), 1000)
     } catch (error) {
-      console.error("Error afegint producte:", error);
+      console.error("Error afegint producte:", error)
+      toast.error("Error afegint producte")
     }
-  };
+  }
 
   const editarPreu = async (id, preuActual, stockActual) => {
-    const nouPreu = prompt("Nou preu (€):", preuActual);
-    if (nouPreu !== null) {
-      await fetch(`/api/productes/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ preu: nouPreu, stock: stockActual }),
-      });
-      carregarProductes();
-      setEditantProducteId(null);
-    }
-  };
+    setEditMode({
+      id,
+      field: "preu",
+      value: preuActual,
+    })
+  }
 
   const editarStock = async (id, preuActual, stockActual) => {
-    const nouStock = prompt("Nou stock:", stockActual);
-    if (nouStock !== null) {
-      await fetch(`/api/productes/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ preu: preuActual, stock: nouStock }),
-      });
-      carregarProductes();
-      setEditantProducteId(null);
+    setEditMode({
+      id,
+      field: "stock",
+      value: stockActual,
+    })
+  }
+
+  const saveEdit = async () => {
+    const { id, field, value } = editMode
+    const producte = productes.find((p) => p.id === id)
+
+    if (!producte) return
+
+    const updateData = {
+      preu: field === "preu" ? value : producte.preu,
+      stock: field === "stock" ? value : producte.stock,
     }
-  };
+
+    try {
+      await toast.promise(
+        fetch(`/api/productes/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updateData),
+        }),
+        {
+          loading: `Actualitzant ${field}...`,
+          success: `${field === "preu" ? "Preu" : "Stock"} actualitzat correctament!`,
+          error: `Error actualitzant ${field}`,
+        },
+      )
+
+      await carregarProductes()
+      cancelEdit()
+    } catch (error) {
+      console.error(`Error actualitzant ${field}:`, error)
+    }
+  }
+
+  const cancelEdit = () => {
+    setEditMode({
+      id: null,
+      field: null,
+      value: "",
+    })
+  }
 
   const eliminarProducte = async (id) => {
-    if (confirm("Segur que vols eliminar aquest producte?")) {
-      await fetch(`/api/productes/${id}`, { method: "DELETE" });
-      carregarProductes();
+    setConfirmDelete(id)
+  }
+
+  const confirmDeleteProduct = async () => {
+    try {
+      await toast.promise(fetch(`/api/productes/${confirmDelete}`, { method: "DELETE" }), {
+        loading: "Eliminant producte...",
+        success: "Producte eliminat correctament!",
+        error: "Error eliminant producte",
+      })
+      await carregarProductes()
+      setConfirmDelete(null)
+    } catch (error) {
+      console.error("Error eliminant producte:", error)
     }
-  };
+  }
 
   const carregarComandes = async () => {
     try {
-      const resposta = await fetch("/api/comanda");
-      const dades = await resposta.json();
-      if (Array.isArray(dades)) setComandes(dades);
+      const resposta = await fetch("/api/comanda")
+      const dades = await resposta.json()
+      if (Array.isArray(dades)) setComandes(dades)
     } catch (error) {
-      console.error("Error carregant comandes:", error);
+      console.error("Error carregant comandes:", error)
+      toast.error("Error carregant comandes")
     }
-  };
+  }
 
   const carregarProductes = async () => {
     try {
-      const resposta = await fetch("/api/productes");
-      const dades = await resposta.json();
-      if (Array.isArray(dades)) setProductes(dades);
+      const resposta = await fetch("/api/productes")
+      const dades = await resposta.json()
+      if (Array.isArray(dades)) setProductes(dades)
     } catch (error) {
-      console.error("Error carregant productes:", error);
+      console.error("Error carregant productes:", error)
+      toast.error("Error carregant productes")
     }
-  };
+  }
 
   const marcarComEnviada = async (id) => {
-	  const { data: { session } } = await supabase.auth.getSession();
-	  
-	  if (!session) {
-	    console.error("No hi ha sessió activa!");
-	    return;
-	  }
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
 
-	  await fetch(`/api/comanda/${id}`, {
-	    method: "PUT",
-	    headers: {
-	      "Content-Type": "application/json",
-	      "Authorization": `Bearer ${session.access_token}`, // 🔥 Aquí passem el token!
-	    },
-	    body: JSON.stringify({ estat: "enviada" }),
-	  });
+      if (!session) {
+        toast.error("No hi ha sessió activa!")
+        return
+      }
 
-	  carregarComandes();
-	};
+      await toast.promise(
+        fetch(`/api/comanda/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ estat: "enviada" }),
+        }),
+        {
+          loading: "Actualitzant estat...",
+          success: "Comanda marcada com enviada!",
+          error: "Error actualitzant comanda",
+        },
+      )
+
+      await carregarComandes()
+    } catch (error) {
+      console.error("Error marcant comanda com enviada:", error)
+    }
+  }
 
   const tancarSessio = async () => {
-  	const { error } = await supabase.auth.signOut();
-  	if (error) {
-  	  console.error("Error tancant sessió:", error);
- 	 } else {
-    	window.location.href = "/login";
-  	}
-	};
+    try {
+      await supabase.auth.signOut()
+      toast.success("Sessió tancada correctament")
+      setTimeout(() => {
+        window.location.href = "/login"
+      }, 1000)
+    } catch (error) {
+      console.error("Error tancant sessió:", error)
+      toast.error("Error tancant sessió")
+    }
+  }
 
   const comandesFiltrades = comandes.filter((c) => {
-    const dataComanda = new Date(c.data).toISOString().split("T")[0];
-    const compleixData = !filtreData || filtreData === dataComanda;
-    const compleixEstat = filtreEstat === "tots" || c.estat === filtreEstat;
-    const compleixEnviament = filtreEnviament === "tots" || c.enviament === filtreEnviament;
-    const cercaText = filtreCerca.toLowerCase();
-    const compleixCerca = c.nom.toLowerCase().includes(cercaText) || c.telefon.includes(cercaText);
-    return compleixData && compleixEstat && compleixEnviament && compleixCerca;
-  });
+    const dataComanda = new Date(c.data).toISOString().split("T")[0]
+    const compleixData = !filtreData || filtreData === dataComanda
+    const compleixEstat = filtreEstat === "tots" || c.estat === filtreEstat
+    const compleixEnviament = filtreEnviament === "tots" || c.enviament === filtreEnviament
+    const cercaText = filtreCerca.toLowerCase()
+    const compleixCerca = c.nom.toLowerCase().includes(cercaText) || c.telefon.includes(cercaText)
+    return compleixData && compleixEstat && compleixEnviament && compleixCerca
+  })
 
   const exportarExcel = () => {
     const dades = comandesFiltrades.map((c) => {
-      let total = 0;
+      let total = 0
       try {
-        const productesArray = JSON.parse(c.productes);
-        total = productesArray.reduce((acc, p) => acc + (p.quantitat || 1) * parseFloat(p.preu), 0);
+        const productesArray = JSON.parse(c.productes)
+        total = productesArray.reduce((acc, p) => acc + (p.quantitat || 1) * Number.parseFloat(p.preu), 0)
       } catch {}
       return {
         ID: c.id,
@@ -152,122 +274,698 @@ function Admin() {
         Estat: c.estat,
         Data: new Date(c.data).toLocaleString(),
         Total: total.toFixed(2) + " €",
-      };
-    });
+      }
+    })
 
-    const worksheet = XLSX.utils.json_to_sheet(dades);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Comandes");
-    XLSX.writeFile(workbook, "comandes.xlsx");
-  };
+    const worksheet = XLSX.utils.json_to_sheet(dades)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Comandes")
+    XLSX.writeFile(workbook, "comandes.xlsx")
+    toast.success("Excel exportat correctament!")
+  }
+
+  // Calcular estadísticas
+  const totalComandes = comandes.length
+  const comandesPendents = comandes.filter((c) => c.estat === "pendent").length
+  const comandesEnviades = comandes.filter((c) => c.estat === "enviada").length
+  const comandesDomicili = comandes.filter((c) => c.enviament === "domicili").length
+  const comandesRecollida = comandes.filter((c) => c.enviament === "recollida").length
+
+  const totalProductes = productes.length
+  const productesAmbStock = productes.filter((p) => p.stock > 0).length
+  const productesSenseStock = productes.filter((p) => p.stock <= 0).length
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <main className="p-8 bg-gray-50 min-h-screen max-w-6xl mx-auto">
+      <Toaster position="top-right" />
 
-        {/* Capçalera */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">👩 Carla Carrera⚕️ Panell d'administració</h1>
-          <button onClick={tancarSessio} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Tancar sessió</button>
-        </div>
-
-        {/* Formulari de Producte */}
-        <form onSubmit={afegirProducte} className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10 bg-white p-6 rounded shadow">
-          <input name="nom" placeholder="Nom" value={formulari.nom} onChange={handleChange} required className="border px-4 py-2 rounded" />
-          <input name="descripcio" placeholder="Descripció" value={formulari.descripcio} onChange={handleChange} required className="border px-4 py-2 rounded" />
-          <input name="preu" placeholder="Preu (€)" value={formulari.preu} onChange={handleChange} type="number" required className="border px-4 py-2 rounded" />
-          <input name="imatge" placeholder="Imatge (ex: producte.jpg)" value={formulari.imatge} onChange={handleChange} required className="border px-4 py-2 rounded" />
-          <select name="animal" value={formulari.animal} onChange={handleChange} required className="border px-4 py-2 rounded">
-            <option value="">Selecciona Animal</option>
-            <option value="gos">Gos</option>
-            <option value="gat">Gat</option>
-            <option value="altres">Altres</option>
-          </select>
-          <select name="categoria" value={formulari.categoria} onChange={handleChange} required className="border px-4 py-2 rounded">
-            <option value="">Selecciona Categoria</option>
-            <option value="menjar">Menjar</option>
-            <option value="snacks">Snacks</option>
-            <option value="cosmetica">Cosmètica</option>
-            <option value="accessoris">Accessoris</option>
-          </select>
-          <input name="stock" placeholder="Stock" value={formulari.stock} onChange={handleChange} type="number" required className="border px-4 py-2 rounded" />
-          <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white col-span-2 py-2 rounded">Afegir producte</button>
-        </form>
-
-        {/* Productes Llistat */}
-        <h2 className="text-xl font-bold mb-4">📦 Productes actuals</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {productes.map((prod) => (
-            <div key={prod.id} className="bg-white p-4 rounded shadow text-center">
-              <img src={`/${prod.imatge}`} alt={prod.nom} className="w-full h-40 object-cover rounded mb-2" />
-              <h3 className="font-semibold text-blue-800">{prod.nom}</h3>
-              <p className="text-sm text-gray-600">{prod.descripcio}</p>
-              <p className="font-bold text-green-700">{prod.preu} €</p>
-              <p className={prod.stock > 0 ? "text-sm text-gray-700" : "text-sm text-red-500"}>{prod.stock > 0 ? `Stock: ${prod.stock}` : "Sense stock"}</p>
-              <div className="flex flex-col gap-2 mt-2">
-                {editantProducteId === prod.id ? (
-                  <>
-                    <button onClick={() => editarPreu(prod.id, prod.preu, prod.stock)} className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">Editar Preu</button>
-                    <button onClick={() => editarStock(prod.id, prod.preu, prod.stock)} className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded">Editar Stock</button>
-                    <button onClick={() => setEditantProducteId(null)} className="text-gray-500">Cancelar</button>
-                  </>
-                ) : (
-                  <>
-                    <button onClick={() => setEditantProducteId(prod.id)} className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded">Editar</button>
-                    <button onClick={() => eliminarProducte(prod.id)} className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">Eliminar</button>
-                  </>
-                )}
-              </div>
+      <main className="container mx-auto py-8 px-4">
+        <div className="max-w-7xl mx-auto">
+          {/* Capçalera */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4"
+          >
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Panell d'administració</h1>
+              <p className="text-gray-600">Centre Veterinari Navarcles</p>
             </div>
-          ))}
-        </div>
 
-        {/* Filtres i exportació */}
-        <h2 className="text-xl font-bold my-6">📋 Comandes</h2>
-        <div className="flex flex-wrap gap-4 mb-6">
-          <input type="text" placeholder="Buscar per nom o telèfon" value={filtreCerca} onChange={(e) => setFiltreCerca(e.target.value)} className="border px-4 py-2 rounded" />
-          <input type="date" value={filtreData} onChange={(e) => setFiltreData(e.target.value)} className="border px-4 py-2 rounded" />
-          <select value={filtreEstat} onChange={(e) => setFiltreEstat(e.target.value)} className="border px-4 py-2 rounded">
-            <option value="tots">Tots</option>
-            <option value="pendent">Pendent</option>
-            <option value="enviada">Enviada</option>
-          </select>
-          <select value={filtreEnviament} onChange={(e) => setFiltreEnviament(e.target.value)} className="border px-4 py-2 rounded">
-            <option value="tots">Tots</option>
-            <option value="domicili">Domicili</option>
-            <option value="recollida">Recollida</option>
-          </select>
-          <button onClick={exportarExcel} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Exportar a Excel</button>
-        </div>
+            <div className="flex items-center gap-4">
+              <Button variant="outline" onClick={() => router.push("/admin/noticies")}>
+                Gestionar Notícies
+              </Button>
+              <Button variant="destructive" onClick={tancarSessio}>
+                <LogOut className="mr-2 h-4 w-4" /> Tancar sessió
+              </Button>
+            </div>
+          </motion.div>
 
-        {/* Llistat de comandes */}
-        <div className="space-y-6">
-          {comandesFiltrades.length === 0 ? (
-            <p className="text-gray-600">No hi ha comandes amb aquests filtres.</p>
-          ) : (
-            comandesFiltrades.map((comanda) => (
-              <div key={comanda.id} className="bg-white p-6 rounded shadow">
-                <h3 className="font-semibold">Comanda #{comanda.id}</h3>
-                <p><strong>Nom:</strong> {comanda.nom}</p>
-                <p><strong>Telèfon:</strong> {comanda.telefon}</p>
-                <p><strong>Adreça:</strong> {comanda.adreca}</p>
-                <p><strong>Enviament:</strong> {comanda.enviament === "domicili" ? "Domicili" : "Recollida"}</p>
-                <p><strong>Data:</strong> {new Date(comanda.data).toLocaleString()}</p>
-                <p><strong>Estat:</strong> {comanda.estat === "enviada" ? "📦 Enviada" : "⏳ Pendent"}</p>
-                {comanda.estat !== "enviada" && (
-                  <button onClick={() => marcarComEnviada(comanda.id)} className="mt-3 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Marcar com enviada</button>
-                )}
-              </div>
-            ))
-          )}
+          {/* Resumen de estadísticas */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+          >
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-gray-500">Total Comandes</p>
+                    <p className="text-3xl font-bold">{totalComandes}</p>
+                  </div>
+                  <div className="p-3 bg-blue-100 rounded-full">
+                    <ShoppingCart className="h-6 w-6 text-blue-600" />
+                  </div>
+                </div>
+                <div className="flex justify-between mt-4 text-sm">
+                  <div>
+                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                      <Clock className="mr-1 h-3 w-3" /> {comandesPendents} pendents
+                    </Badge>
+                  </div>
+                  <div>
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                      <CheckCircle className="mr-1 h-3 w-3" /> {comandesEnviades} enviades
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-gray-500">Enviaments</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-3xl font-bold">{comandesDomicili}</p>
+                      <p className="text-sm text-gray-500">domicili</p>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-purple-100 rounded-full">
+                    <Truck className="h-6 w-6 text-purple-600" />
+                  </div>
+                </div>
+                <div className="flex justify-between mt-4 text-sm">
+                  <div>
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                      <Home className="mr-1 h-3 w-3" /> {comandesRecollida} recollida
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-gray-500">Total Productes</p>
+                    <p className="text-3xl font-bold">{totalProductes}</p>
+                  </div>
+                  <div className="p-3 bg-green-100 rounded-full">
+                    <Package className="h-6 w-6 text-green-600" />
+                  </div>
+                </div>
+                <div className="flex justify-between mt-4 text-sm">
+                  <div>
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                      <CheckCircle className="mr-1 h-3 w-3" /> {productesAmbStock} amb stock
+                    </Badge>
+                  </div>
+                  <div>
+                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                      <AlertTriangle className="mr-1 h-3 w-3" /> {productesSenseStock} sense stock
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6 flex flex-col h-full justify-between">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-gray-500">Accions ràpides</p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 mt-4">
+                  <Button size="sm" onClick={exportarExcel}>
+                    <Download className="mr-2 h-4 w-4" /> Exportar comandes
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setActiveTab("productes")}>
+                    <Plus className="mr-2 h-4 w-4" /> Afegir producte
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Tabs principales */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="productes" className="flex items-center gap-2">
+                  <Package className="h-4 w-4" /> Gestió de Productes
+                </TabsTrigger>
+                <TabsTrigger value="comandes" className="flex items-center gap-2">
+                  <ShoppingCart className="h-4 w-4" /> Gestió de Comandes
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Tab de Productos */}
+              <TabsContent value="productes" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Afegir nou producte</CardTitle>
+                    <CardDescription>Omple el formulari per afegir un nou producte a la botiga</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={afegirProducte} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label htmlFor="nom" className="text-sm font-medium">
+                          Nom del producte
+                        </label>
+                        <Input
+                          id="nom"
+                          name="nom"
+                          placeholder="Nom"
+                          value={formulari.nom}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="descripcio" className="text-sm font-medium">
+                          Descripció
+                        </label>
+                        <Input
+                          id="descripcio"
+                          name="descripcio"
+                          placeholder="Descripció"
+                          value={formulari.descripcio}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="preu" className="text-sm font-medium">
+                          Preu (€)
+                        </label>
+                        <Input
+                          id="preu"
+                          name="preu"
+                          placeholder="Preu (€)"
+                          value={formulari.preu}
+                          onChange={handleChange}
+                          type="number"
+                          step="0.01"
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="imatge" className="text-sm font-medium">
+                          Imatge (URL)
+                        </label>
+                        <Input
+                          id="imatge"
+                          name="imatge"
+                          placeholder="Imatge (ex: producte.jpg)"
+                          value={formulari.imatge}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="animal" className="text-sm font-medium">
+                          Animal
+                        </label>
+                        <Select
+                          name="animal"
+                          value={formulari.animal}
+                          onValueChange={(value) => setFormulari({ ...formulari, animal: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona Animal" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="gos">Gos</SelectItem>
+                            <SelectItem value="gat">Gat</SelectItem>
+                            <SelectItem value="altres">Altres</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="categoria" className="text-sm font-medium">
+                          Categoria
+                        </label>
+                        <Select
+                          name="categoria"
+                          value={formulari.categoria}
+                          onValueChange={(value) => setFormulari({ ...formulari, categoria: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona Categoria" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="menjar">Menjar</SelectItem>
+                            <SelectItem value="snacks">Snacks</SelectItem>
+                            <SelectItem value="cosmetica">Cosmètica</SelectItem>
+                            <SelectItem value="accessoris">Accessoris</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="stock" className="text-sm font-medium">
+                          Stock
+                        </label>
+                        <Input
+                          id="stock"
+                          name="stock"
+                          placeholder="Stock"
+                          value={formulari.stock}
+                          onChange={handleChange}
+                          type="number"
+                          required
+                        />
+                      </div>
+
+                      <div className="md:col-span-2 flex justify-end">
+                        <Button type="submit" className="w-full md:w-auto">
+                          <Plus className="mr-2 h-4 w-4" /> Afegir producte
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
+
+                <h2 className="text-2xl font-bold mt-8 mb-4 flex items-center gap-2">
+                  <Package className="h-5 w-5" /> Productes actuals
+                </h2>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {productes.map((prod) => (
+                    <motion.div
+                      key={prod.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Card className="overflow-hidden h-full flex flex-col">
+                        <div className="aspect-square overflow-hidden bg-gray-100">
+                          <img
+                            src={`/${prod.imatge}`}
+                            alt={prod.nom}
+                            className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
+                          />
+                        </div>
+                        <CardContent className="p-4 flex-grow">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-semibold text-lg text-gray-900">{prod.nom}</h3>
+                            <Badge
+                              variant="outline"
+                              className={
+                                prod.stock > 10
+                                  ? "bg-green-50 text-green-700 border-green-200"
+                                  : prod.stock > 0
+                                    ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                    : "bg-red-50 text-red-700 border-red-200"
+                              }
+                            >
+                              Stock: {prod.stock}
+                            </Badge>
+                          </div>
+
+                          <div className="flex gap-2 mb-2">
+                            <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                              {prod.animal}
+                            </Badge>
+                            <Badge variant="secondary" className="bg-purple-100 text-purple-800 hover:bg-purple-100">
+                              {prod.categoria}
+                            </Badge>
+                          </div>
+
+                          <p className="text-sm text-gray-600 mb-4 line-clamp-2">{prod.descripcio}</p>
+
+                          {editMode.id === prod.id && editMode.field === "preu" ? (
+                            <div className="flex items-center gap-2 mb-2">
+                              <Input
+                                type="number"
+                                step="0.01"
+                                value={editMode.value}
+                                onChange={(e) => setEditMode({ ...editMode, value: e.target.value })}
+                                className="w-24"
+                              />
+                              <Button size="icon" variant="ghost" onClick={saveEdit}>
+                                <Save className="h-4 w-4" />
+                              </Button>
+                              <Button size="icon" variant="ghost" onClick={cancelEdit}>
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="font-bold text-lg text-green-700">{prod.preu} €</span>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => editarPreu(prod.id, prod.preu, prod.stock)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
+
+                          {editMode.id === prod.id && editMode.field === "stock" ? (
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="number"
+                                value={editMode.value}
+                                onChange={(e) => setEditMode({ ...editMode, value: e.target.value })}
+                                className="w-24"
+                              />
+                              <Button size="icon" variant="ghost" onClick={saveEdit}>
+                                <Save className="h-4 w-4" />
+                              </Button>
+                              <Button size="icon" variant="ghost" onClick={cancelEdit}>
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-gray-600">Stock: {prod.stock}</span>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => editarStock(prod.id, prod.preu, prod.stock)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </CardContent>
+                        <CardFooter className="p-4 pt-0 flex justify-end">
+                          <Button variant="destructive" size="sm" onClick={() => eliminarProducte(prod.id)}>
+                            <Trash2 className="mr-2 h-4 w-4" /> Eliminar
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </TabsContent>
+
+              {/* Tab de Pedidos */}
+              <TabsContent value="comandes" className="mt-6">
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle>Filtres de comandes</CardTitle>
+                    <CardDescription>Filtra les comandes per data, estat o tipus d'enviament</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="space-y-2">
+                        <label htmlFor="cerca" className="text-sm font-medium">
+                          Cerca
+                        </label>
+                        <div className="relative">
+                          <Search
+                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                            size={16}
+                          />
+                          <Input
+                            id="cerca"
+                            placeholder="Nom o telèfon"
+                            value={filtreCerca}
+                            onChange={(e) => setFiltreCerca(e.target.value)}
+                            className="pl-9"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="data" className="text-sm font-medium">
+                          Data
+                        </label>
+                        <div className="relative">
+                          <Calendar
+                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                            size={16}
+                          />
+                          <Input
+                            id="data"
+                            type="date"
+                            value={filtreData}
+                            onChange={(e) => setFiltreData(e.target.value)}
+                            className="pl-9"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="estat" className="text-sm font-medium">
+                          Estat
+                        </label>
+                        <Select value={filtreEstat} onValueChange={setFiltreEstat}>
+                          <SelectTrigger id="estat">
+                            <SelectValue placeholder="Selecciona estat" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="tots">Tots</SelectItem>
+                            <SelectItem value="pendent">Pendent</SelectItem>
+                            <SelectItem value="enviada">Enviada</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="enviament" className="text-sm font-medium">
+                          Enviament
+                        </label>
+                        <Select value={filtreEnviament} onValueChange={setFiltreEnviament}>
+                          <SelectTrigger id="enviament">
+                            <SelectValue placeholder="Tipus d'enviament" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="tots">Tots</SelectItem>
+                            <SelectItem value="domicili">Domicili</SelectItem>
+                            <SelectItem value="recollida">Recollida</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setFiltreData("")
+                        setFiltreEstat("tots")
+                        setFiltreEnviament("tots")
+                        setFiltreCerca("")
+                      }}
+                    >
+                      Netejar filtres
+                    </Button>
+                    <Button onClick={exportarExcel}>
+                      <Download className="mr-2 h-4 w-4" /> Exportar a Excel
+                    </Button>
+                  </CardFooter>
+                </Card>
+
+                <div className="space-y-6">
+                  {comandesFiltrades.length === 0 ? (
+                    <Card>
+                      <CardContent className="flex flex-col items-center justify-center py-10">
+                        <div className="rounded-full bg-gray-100 p-3 mb-4">
+                          <Filter className="h-6 w-6 text-gray-400" />
+                        </div>
+                        <h3 className="text-lg font-medium mb-2">No hi ha comandes amb aquests filtres</h3>
+                        <p className="text-gray-500 text-center max-w-md">
+                          Prova de canviar els filtres o netejar-los per veure totes les comandes disponibles.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    comandesFiltrades.map((comanda) => {
+                      // Calcular el total de la comanda
+                      let total = 0
+			let productsArray = []
+
+			try {
+			  // Només parsejar si és un string
+			  if (typeof comanda.productes === "string") {
+			    productsArray = JSON.parse(comanda.productes)
+			  } else if (Array.isArray(comanda.productes)) {
+			    productsArray = comanda.productes
+			  }
+
+			  total = productsArray.reduce(
+			    (acc, p) => acc + (p.quantitat || 1) * Number.parseFloat(p.preu),
+			    0
+			  )
+			} catch (e) {
+			  console.error("Error parsejant productes:", e, comanda.productes)
+			}
+
+
+                      return (
+                        <motion.div
+                          key={comanda.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                        >
+                          <Card>
+                            <CardHeader>
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <CardTitle className="flex items-center gap-2">
+                                    Comanda #{comanda.id}
+                                    <Badge
+                                      variant={comanda.estat === "enviada" ? "default" : "secondary"}
+                                      className={
+                                        comanda.estat === "enviada"
+                                          ? "bg-green-100 text-green-800 hover:bg-green-100"
+                                          : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+                                      }
+                                    >
+                                      {comanda.estat === "enviada" ? "Enviada" : "Pendent"}
+                                    </Badge>
+                                  </CardTitle>
+                                  <CardDescription>
+                                    {new Date(comanda.data).toLocaleDateString()} -{" "}
+                                    {new Date(comanda.data).toLocaleTimeString()}
+                                  </CardDescription>
+                                </div>
+                                <div>
+                                  <Badge
+                                    variant="outline"
+                                    className={
+                                      comanda.enviament === "domicili"
+                                        ? "bg-blue-50 text-blue-700 border-blue-200"
+                                        : "bg-purple-50 text-purple-700 border-purple-200"
+                                    }
+                                  >
+                                    {comanda.enviament === "domicili" ? (
+                                      <Truck className="mr-1 h-3 w-3" />
+                                    ) : (
+                                      <Home className="mr-1 h-3 w-3" />
+                                    )}
+                                    {comanda.enviament === "domicili" ? "Enviament a domicili" : "Recollida al local"}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                  <h3 className="text-sm font-medium text-gray-500 mb-2">Dades del client</h3>
+                                  <div className="space-y-2">
+                                    <p className="text-sm">
+                                      <span className="font-medium">Nom:</span> {comanda.nom}
+                                    </p>
+                                    <p className="text-sm">
+                                      <span className="font-medium">Telèfon:</span> {comanda.telefon}
+                                    </p>
+                                    {comanda.enviament === "domicili" && (
+                                      <p className="text-sm">
+                                        <span className="font-medium">Adreça:</span> {comanda.adreca}
+                                      </p>
+                                    )}
+                                    {comanda.observacions && (
+                                      <p className="text-sm">
+                                        <span className="font-medium">Observacions:</span> {comanda.observacions}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div>
+                                  <h3 className="text-sm font-medium text-gray-500 mb-2">Productes</h3>
+                                  <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
+                                    {productsArray.length > 0 ? (
+                                      productsArray.map((prod, index) => (
+                                        <div key={index} className="flex justify-between text-sm border-b pb-1">
+                                          <span>
+                                            {prod.quantitat || 1} x {prod.nom}
+                                          </span>
+                                          <span className="font-medium">
+                                            {((prod.quantitat || 1) * Number.parseFloat(prod.preu)).toFixed(2)} €
+                                          </span>
+                                        </div>
+                                      ))
+                                    ) : (
+                                      <p className="text-sm text-gray-500">No hi ha detalls de productes disponibles</p>
+                                    )}
+                                  </div>
+                                  <div className="flex justify-end mt-4">
+                                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                      Total: {total.toFixed(2)} €
+                                    </Badge>
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                            <CardFooter className="flex justify-end">
+                              {comanda.estat !== "enviada" && (
+                                <Button onClick={() => marcarComEnviada(comanda.id)}>
+                                  <CheckCircle className="mr-2 h-4 w-4" /> Marcar com enviada
+                                </Button>
+                              )}
+                            </CardFooter>
+                          </Card>
+                        </motion.div>
+                      )
+                    })
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </motion.div>
         </div>
       </main>
+
+      {/* Diálogo de confirmación para eliminar producto */}
+      <Dialog open={confirmDelete !== null} onOpenChange={(open) => !open && setConfirmDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar eliminació</DialogTitle>
+            <DialogDescription>
+              Estàs segur que vols eliminar aquest producte? Aquesta acció no es pot desfer.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmDelete(null)}>
+              Cancel·lar
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteProduct}>
+              Eliminar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
-  );
+  )
 }
 
-export default withAuth(Admin);
+export default withAuth(Admin)
+
 
 
 

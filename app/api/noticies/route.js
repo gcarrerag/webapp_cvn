@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import supabase from "@/lib/supabase";
+import supabase from "@/lib/supabaseAdmin"; // Client amb permisos elevats
 
 // 🔵 GET: Llistar totes les notícies
 export async function GET() {
@@ -29,7 +29,7 @@ export async function POST(request) {
     if (imatge && imatge.size > 0) {
       const nomArxiu = `${Date.now()}_${imatge.name}`;
 
-      const { data: storageData, error: storageError } = await supabase
+      const { error: storageError } = await supabase
         .storage
         .from("noticies")
         .upload(nomArxiu, imatge, { cacheControl: "3600", upsert: false });
@@ -44,7 +44,7 @@ export async function POST(request) {
 
     const dataActual = new Date().toISOString();
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("noticies")
       .insert([{ titol, contingut: cos, imatge: imatgeURL, data: dataActual }]);
 
@@ -79,7 +79,7 @@ export async function PUT(request) {
     if (novaImatge && novaImatge.size > 0) {
       const nomArxiu = `${Date.now()}_${novaImatge.name}`;
 
-      const { data: storageData, error: storageError } = await supabase
+      const { error: storageError } = await supabase
         .storage
         .from("noticies")
         .upload(nomArxiu, novaImatge, { cacheControl: "3600", upsert: false });
