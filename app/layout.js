@@ -19,6 +19,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ca">
+      <head>
+        {/* 🔵 Afegeix el favicon personalitzat */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <meta name="description" content={metadata.description} />
+        <title>{metadata.title}</title>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
