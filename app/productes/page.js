@@ -47,11 +47,11 @@ export default function Productes() {
   // Función para obtener el color de badge según la categoría
   const getCategoryColor = (categoria) => {
     switch (categoria) {
-      case "menjar":
+      case "alimentacio":
         return "bg-emerald-100 text-emerald-800 hover:bg-emerald-100"
       case "snacks":
         return "bg-amber-100 text-amber-800 hover:bg-amber-100"
-      case "cosmetica":
+      case "higiene":
         return "bg-purple-100 text-purple-800 hover:bg-purple-100"
       case "accessoris":
         return "bg-blue-100 text-blue-800 hover:bg-blue-100"
@@ -98,10 +98,10 @@ export default function Productes() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="tots">Totes</SelectItem>
-              <SelectItem value="menjar">Menjar</SelectItem>
+              <SelectItem value="alimentacio">Alimentació</SelectItem>
               <SelectItem value="snacks">Snacks</SelectItem>
-              <SelectItem value="cosmetica">Cosmètica</SelectItem>
-              <SelectItem value="accessoris">Accessoris</SelectItem>
+              <SelectItem value="higiene">Higiene</SelectItem>
+              <SelectItem value="accessoris">Accessoris i joguines</SelectItem>
               <SelectItem value="altres">Altres</SelectItem>
             </SelectContent>
           </Select>

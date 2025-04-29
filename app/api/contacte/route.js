@@ -1,7 +1,9 @@
+// app/api/contact/route.ts
 import nodemailer from "nodemailer";
+import { NextResponse } from "next/server";
 
-export async function POST(req) {
-  const { nom, telefon, email, tipus, missatge } = await req.json();
+export async function POST(req: Request) {
+  const { name, email, phone, message } = await req.json();
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -12,25 +14,24 @@ export async function POST(req) {
   });
 
   const mailOptions = {
-	  from: `"Formulari web - ${nom}" <${process.env.EMAIL_USER}>`,
-	  to: process.env.EMAIL_TO,
-	  replyTo: email, // ← Això farà que quan facis "respon", responguis al client
-	  subject: `Nou missatge de ${nom} (${tipus})`,
-	  html: `
-	    <p><strong>Nom:</strong> ${nom}</p>
-	    <p><strong>Telèfon:</strong> ${telefon}</p>
-	    <p><strong>Correu electrònic:</strong> ${email}</p>
-	    <p><strong>Tipus:</strong> ${tipus}</p>
-	    <p><strong>Missatge:</strong><br/>${missatge}</p>
-	  `,
-	}
-
+    from: `"Formulari Web - ${name}" <${process.env.EMAIL_USER}>`,
+    to: process.env.EMAIL_TO,
+    replyTo: email,
+    subject: `Nou missatge de ${name}`,
+    html: `
+      <p><strong>Nom:</strong> ${name}</p>
+      <p><strong>Telèfon:</strong> ${phone}</p>
+      <p><strong>Correu electrònic:</strong> ${email}</p>
+      <p><strong>Missatge:</strong><br/>${message}</p>
+    `,
+  };
 
   try {
     await transporter.sendMail(mailOptions);
-    return new Response(JSON.stringify({ ok: true }), { status: 200 });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error enviant el correu:", error);
-    return new Response(JSON.stringify({ ok: false, error: "Error enviant el missatge" }), { status: 500 });
+    return NextResponse.json({ success: false, error: "Error enviant el missatge" }, { status: 500 });
   }
 }
+

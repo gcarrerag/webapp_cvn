@@ -46,10 +46,10 @@ export default function Home() {
       icon: <PawPrint className="h-8 w-8 mb-4 text-amber-500" />,
       description: "Aliments de qualitat per a gossos i gats",
       color: "bg-amber-50 border-amber-200",
-      link: "/productes?categoria=alimentacio",
+      link: "/productes?categoria=menjar",
     },
     {
-      name: "Accessoris i joguines",
+      name: "Accessoris",
       icon: <Heart className="h-8 w-8 mb-4 text-rose-500" />,
       description: "Tot el que necessiten per al seu dia a dia",
       color: "bg-rose-50 border-rose-200",
@@ -60,7 +60,7 @@ export default function Home() {
       icon: <Shield className="h-8 w-8 mb-4 text-blue-500" />,
       description: "Productes per a la cura i salut de la teva mascota",
       color: "bg-blue-50 border-blue-200",
-      link: "/productes?categoria=higiene",
+      link: "/productes?categoria=cosmetica",
     },
   ]
 
@@ -149,10 +149,9 @@ export default function Home() {
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               Benestar per a la teva{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-stone-600">
-		  mascota
-		</span>
-
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+                mascota
+              </span>
             </h1>
             <p className="text-lg md:text-xl mb-8 text-white/90 max-w-2xl mx-auto leading-relaxed">
               A la nostra clínica i botiga veterinària trobaràs tot el que necessita la teva mascota amb cura, amor i
@@ -160,33 +159,21 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Button
-		  size="lg"
-		  className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white transition-colors"
-		  asChild
-		>
-		  <Link href="/productes">
-		    Descobreix els nostres productes
-		    <ArrowRight className="ml-2 h-4 w-4" />
-		  </Link>
-		</Button>
-
-		<Button
-		  size="lg"
-		  className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white transition-colors"
-		  asChild
-		>
-		  <Link href="/serveis">Els nostres serveis</Link>
-		</Button>
-
-		<Button
-		  size="lg"
-		  className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white transition-colors"
-		  asChild
-		>
-		  <Link href="/contacte">Contacta'ns</Link>
-		</Button>
-
-
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                asChild
+              >
+                <Link href="/productes">
+                  Descobreix els nostres productes
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" asChild>
+                <Link href="/serveis">Els nostres serveis</Link>
+              </Button>
+              <Button size="lg" variant="secondary" asChild>
+                <Link href="/contacte">Contacta'ns</Link>
+              </Button>
             </div>
           </motion.div>
         </div>

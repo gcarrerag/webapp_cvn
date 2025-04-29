@@ -542,10 +542,10 @@ function Admin() {
                             <SelectValue placeholder="Selecciona Categoria" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="menjar">Menjar</SelectItem>
+                            <SelectItem value="alimentacio">Alimentació</SelectItem>
                             <SelectItem value="snacks">Snacks</SelectItem>
-                            <SelectItem value="cosmetica">Cosmètica</SelectItem>
-                            <SelectItem value="accessoris">Accessoris</SelectItem>
+                            <SelectItem value="higiene">Higiene</SelectItem>
+                            <SelectItem value="accessoris">Accessoris i joguines</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
