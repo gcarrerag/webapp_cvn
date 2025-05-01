@@ -282,8 +282,18 @@ export default function Home() {
       </section>
 
       {/* Servicios destacados */}
-      <section ref={servicesRef} className="py-24 bg-gradient-to-b from-amber-50 to-stone-100 overflow-hidden">
-        <div className="container mx-auto px-4">
+      <section ref={servicesRef} className="py-24 bg-gradient-to-b from-amber-50 to-stone-100 overflow-hidden relative">
+        {/* Huella en la sección de servicios */}
+        <motion.div
+          className="absolute top-10 right-0"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 0.1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <PawPrint className="h-64 w-64 text-amber-800" />
+        </motion.div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -358,8 +368,18 @@ export default function Home() {
       </section>
 
       {/* Categorías destacadas */}
-      <section id="categories" className="py-24 bg-stone-100">
-        <div className="container mx-auto px-4">
+      <section id="categories" className="py-24 bg-stone-100 relative">
+        {/* Huella en la sección de categorías */}
+        <motion.div
+          className="absolute top-10 right-0"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 0.1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <PawPrint className="h-64 w-64 text-amber-800" />
+        </motion.div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -407,8 +427,18 @@ export default function Home() {
       </section>
 
       {/* Equipo */}
-      <section className="py-24 bg-amber-50">
-        <div className="container mx-auto px-4">
+      <section className="py-24 bg-amber-50 relative">
+        {/* Huella en la sección del equipo */}
+        <motion.div
+          className="absolute top-10 right-0"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 0.1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <PawPrint className="h-64 w-64 text-amber-800" />
+        </motion.div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -484,8 +514,18 @@ export default function Home() {
       </section>
 
       {/* Sección informativa con imagen */}
-      <section className="py-24 bg-stone-100 overflow-hidden">
-        <div className="container mx-auto px-4">
+      <section className="py-24 bg-stone-100 overflow-hidden relative">
+        {/* Huella en la sección informativa */}
+        <motion.div
+          className="absolute top-10 right-0"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 0.1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <PawPrint className="h-64 w-64 text-amber-800" />
+        </motion.div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -619,8 +659,18 @@ export default function Home() {
       </section>
 
       {/* Horarios y ubicación */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4">
+      <section className="py-24 bg-white relative">
+        {/* Huella en la sección de horarios */}
+        <motion.div
+          className="absolute top-10 right-0"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 0.1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <PawPrint className="h-64 w-64 text-amber-800" />
+        </motion.div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -751,8 +801,18 @@ export default function Home() {
       </section>
 
       {/* Testimonios */}
-      <section ref={testimonialsRef} className="py-24 bg-amber-50">
-        <div className="container mx-auto px-4">
+      <section ref={testimonialsRef} className="py-24 bg-amber-50 relative">
+        {/* Huella en la sección de testimonios */}
+        <motion.div
+          className="absolute top-10 right-0"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 0.1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <PawPrint className="h-64 w-64 text-amber-800" />
+        </motion.div>
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -811,6 +871,16 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="py-24 bg-gradient-to-r from-amber-700 to-stone-800 text-white relative overflow-hidden">
+        {/* Huella en la sección CTA */}
+        <motion.div
+          className="absolute top-10 right-0"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 0.1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <PawPrint className="h-64 w-64 text-white" />
+        </motion.div>
+
         <div className="absolute inset-0 bg-[url('/abstract-geometric-flow.png')] opacity-10 mix-blend-overlay"></div>
         <motion.div
           className="absolute -top-20 -left-20 w-40 h-40 bg-amber-500/20 rounded-full blur-3xl"
@@ -858,8 +928,8 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-stone-900 text-white pt-16 pb-8">
-        <div className="container mx-auto px-4">
+      <footer className="bg-stone-900 text-white pt-16 pb-8 relative">
+        <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             <div>
               <h3 className="text-xl font-bold mb-6 text-amber-200">Centre Veterinari Navarcles</h3>
