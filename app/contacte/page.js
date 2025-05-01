@@ -32,6 +32,8 @@ export default function Contacte() {
     telefon: "",
     missatge: "",
     tipus: "consulta",
+    tipusFormulari: "missatge", // o "cita"
+
   })
 
   const [loading, setLoading] = useState(false)
@@ -142,17 +144,21 @@ export default function Contacte() {
                 <Tabs defaultValue="missatge" className="w-full">
                   <TabsList className="grid w-full grid-cols-2 mb-6 bg-stone-100">
                     <TabsTrigger
-                      value="missatge"
-                      className="flex items-center gap-2 data-[state=active]:bg-amber-600 data-[state=active]:text-white"
-                    >
-                      <MessageSquare className="h-4 w-4" /> Missatge
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="cita"
-                      className="flex items-center gap-2 data-[state=active]:bg-amber-600 data-[state=active]:text-white"
-                    >
-                      <CalendarCheck className="h-4 w-4" /> Demanar cita
-                    </TabsTrigger>
+			  value="missatge"
+			  onClick={() => setFormData((prev) => ({ ...prev, tipusFormulari: "missatge" }))}
+			  className="flex items-center gap-2 data-[state=active]:bg-amber-600 data-[state=active]:text-white"
+			>
+			  <MessageSquare className="h-4 w-4" /> Missatge
+			</TabsTrigger>
+
+			<TabsTrigger
+			  value="cita"
+			  onClick={() => setFormData((prev) => ({ ...prev, tipusFormulari: "cita" }))}
+			  className="flex items-center gap-2 data-[state=active]:bg-amber-600 data-[state=active]:text-white"
+			>
+			  <CalendarCheck className="h-4 w-4" /> Demanar cita
+			</TabsTrigger>
+
                   </TabsList>
 
                   <TabsContent value="missatge">
