@@ -24,6 +24,7 @@ import {
   Home,
   Truck,
   AlertTriangle,
+  PawPrint,
 } from "lucide-react"
 
 import { createClient } from "@supabase/supabase-js"
@@ -296,11 +297,37 @@ function Admin() {
   const productesSenseStock = productes.filter((p) => p.stock <= 0).length
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-50">
       <Navbar />
       <Toaster position="top-right" />
 
-      <main className="container mx-auto py-8 px-4">
+      {/* Hero Section */}
+      <section className="relative py-16 bg-gradient-to-b from-amber-50 to-stone-100 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-64 bg-[url('/abstract-geometric-flow.png')] bg-cover opacity-10"></div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="container mx-auto px-4 text-center relative z-10"
+        >
+          <Badge className="mb-4 bg-amber-100 text-amber-800 border-amber-300">Administració</Badge>
+          <h1 className="text-4xl md:text-6xl font-bold text-stone-800 mb-6">Panell d'administració</h1>
+          <p className="text-stone-600 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
+            Gestiona els productes i comandes del Centre Veterinari Navarcles
+          </p>
+        </motion.div>
+
+        <motion.div
+          className="absolute bottom-0 right-0"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 0.1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <PawPrint className="h-64 w-64 text-amber-800" />
+        </motion.div>
+      </section>
+
+      <main className="container mx-auto py-12 px-4 -mt-6">
         <div className="max-w-7xl mx-auto">
           {/* Capçalera */}
           <motion.div
@@ -310,15 +337,19 @@ function Admin() {
             className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4"
           >
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Panell d'administració</h1>
-              <p className="text-gray-600">Centre Veterinari Navarcles</p>
+              <h2 className="text-2xl font-bold text-stone-800">Benvingut/da a l'administració</h2>
+              <p className="text-stone-600">Gestiona tots els aspectes de la teva botiga</p>
             </div>
 
             <div className="flex items-center gap-4">
-              <Button variant="outline" onClick={() => router.push("/admin/noticies")}>
+              <Button
+                variant="outline"
+                onClick={() => router.push("/admin/noticies")}
+                className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
+              >
                 Gestionar Notícies
               </Button>
-              <Button variant="destructive" onClick={tancarSessio}>
+              <Button variant="destructive" onClick={tancarSessio} className="bg-red-600 hover:bg-red-700">
                 <LogOut className="mr-2 h-4 w-4" /> Tancar sessió
               </Button>
             </div>
@@ -331,25 +362,25 @@ function Admin() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
           >
-            <Card>
+            <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm text-gray-500">Total Comandes</p>
-                    <p className="text-3xl font-bold">{totalComandes}</p>
+                    <p className="text-sm text-stone-500">Total Comandes</p>
+                    <p className="text-3xl font-bold text-stone-800">{totalComandes}</p>
                   </div>
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <ShoppingCart className="h-6 w-6 text-blue-600" />
+                  <div className="p-3 bg-amber-100 rounded-full">
+                    <ShoppingCart className="h-6 w-6 text-amber-600" />
                   </div>
                 </div>
                 <div className="flex justify-between mt-4 text-sm">
                   <div>
-                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
                       <Clock className="mr-1 h-3 w-3" /> {comandesPendents} pendents
                     </Badge>
                   </div>
                   <div>
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    <Badge variant="outline" className="bg-stone-50 text-stone-700 border-stone-200">
                       <CheckCircle className="mr-1 h-3 w-3" /> {comandesEnviades} enviades
                     </Badge>
                   </div>
@@ -357,23 +388,23 @@ function Admin() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm text-gray-500">Enviaments</p>
+                    <p className="text-sm text-stone-500">Enviaments</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-3xl font-bold">{comandesDomicili}</p>
-                      <p className="text-sm text-gray-500">domicili</p>
+                      <p className="text-3xl font-bold text-stone-800">{comandesDomicili}</p>
+                      <p className="text-sm text-stone-500">domicili</p>
                     </div>
                   </div>
-                  <div className="p-3 bg-purple-100 rounded-full">
-                    <Truck className="h-6 w-6 text-purple-600" />
+                  <div className="p-3 bg-amber-100 rounded-full">
+                    <Truck className="h-6 w-6 text-amber-600" />
                   </div>
                 </div>
                 <div className="flex justify-between mt-4 text-sm">
                   <div>
-                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                    <Badge variant="outline" className="bg-stone-50 text-stone-700 border-stone-200">
                       <Home className="mr-1 h-3 w-3" /> {comandesRecollida} recollida
                     </Badge>
                   </div>
@@ -381,25 +412,25 @@ function Admin() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300">
               <CardContent className="pt-6">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm text-gray-500">Total Productes</p>
-                    <p className="text-3xl font-bold">{totalProductes}</p>
+                    <p className="text-sm text-stone-500">Total Productes</p>
+                    <p className="text-3xl font-bold text-stone-800">{totalProductes}</p>
                   </div>
-                  <div className="p-3 bg-green-100 rounded-full">
-                    <Package className="h-6 w-6 text-green-600" />
+                  <div className="p-3 bg-amber-100 rounded-full">
+                    <Package className="h-6 w-6 text-amber-600" />
                   </div>
                 </div>
                 <div className="flex justify-between mt-4 text-sm">
                   <div>
-                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                    <Badge variant="outline" className="bg-stone-50 text-stone-700 border-stone-200">
                       <CheckCircle className="mr-1 h-3 w-3" /> {productesAmbStock} amb stock
                     </Badge>
                   </div>
                   <div>
-                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
                       <AlertTriangle className="mr-1 h-3 w-3" /> {productesSenseStock} sense stock
                     </Badge>
                   </div>
@@ -407,18 +438,23 @@ function Admin() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300">
               <CardContent className="pt-6 flex flex-col h-full justify-between">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm text-gray-500">Accions ràpides</p>
+                    <p className="text-sm text-stone-500">Accions ràpides</p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 mt-4">
-                  <Button size="sm" onClick={exportarExcel}>
+                  <Button size="sm" onClick={exportarExcel} className="bg-amber-600 hover:bg-amber-700 text-white">
                     <Download className="mr-2 h-4 w-4" /> Exportar comandes
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => setActiveTab("productes")}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setActiveTab("productes")}
+                    className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
+                  >
                     <Plus className="mr-2 h-4 w-4" /> Afegir producte
                   </Button>
                 </div>
@@ -433,26 +469,34 @@ function Admin() {
             transition={{ duration: 0.5, delay: 0.2 }}
           >
             <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="productes" className="flex items-center gap-2">
+              <TabsList className="grid w-full grid-cols-2 bg-stone-100">
+                <TabsTrigger
+                  value="productes"
+                  className="flex items-center gap-2 data-[state=active]:bg-amber-600 data-[state=active]:text-white"
+                >
                   <Package className="h-4 w-4" /> Gestió de Productes
                 </TabsTrigger>
-                <TabsTrigger value="comandes" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="comandes"
+                  className="flex items-center gap-2 data-[state=active]:bg-amber-600 data-[state=active]:text-white"
+                >
                   <ShoppingCart className="h-4 w-4" /> Gestió de Comandes
                 </TabsTrigger>
               </TabsList>
 
               {/* Tab de Productos */}
               <TabsContent value="productes" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Afegir nou producte</CardTitle>
-                    <CardDescription>Omple el formulari per afegir un nou producte a la botiga</CardDescription>
+                <Card className="border-0 shadow-lg">
+                  <CardHeader className="bg-white border-b border-stone-100">
+                    <CardTitle className="text-stone-800">Afegir nou producte</CardTitle>
+                    <CardDescription className="text-stone-600">
+                      Omple el formulari per afegir un nou producte a la botiga
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-6">
                     <form onSubmit={afegirProducte} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label htmlFor="nom" className="text-sm font-medium">
+                        <label htmlFor="nom" className="text-sm font-medium text-stone-700">
                           Nom del producte
                         </label>
                         <Input
@@ -462,11 +506,12 @@ function Admin() {
                           value={formulari.nom}
                           onChange={handleChange}
                           required
+                          className="border-stone-200 focus:border-amber-300 focus:ring-amber-300"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="descripcio" className="text-sm font-medium">
+                        <label htmlFor="descripcio" className="text-sm font-medium text-stone-700">
                           Descripció
                         </label>
                         <Input
@@ -476,11 +521,12 @@ function Admin() {
                           value={formulari.descripcio}
                           onChange={handleChange}
                           required
+                          className="border-stone-200 focus:border-amber-300 focus:ring-amber-300"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="preu" className="text-sm font-medium">
+                        <label htmlFor="preu" className="text-sm font-medium text-stone-700">
                           Preu (€)
                         </label>
                         <Input
@@ -492,11 +538,12 @@ function Admin() {
                           type="number"
                           step="0.01"
                           required
+                          className="border-stone-200 focus:border-amber-300 focus:ring-amber-300"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="imatge" className="text-sm font-medium">
+                        <label htmlFor="imatge" className="text-sm font-medium text-stone-700">
                           Imatge (URL)
                         </label>
                         <Input
@@ -506,11 +553,12 @@ function Admin() {
                           value={formulari.imatge}
                           onChange={handleChange}
                           required
+                          className="border-stone-200 focus:border-amber-300 focus:ring-amber-300"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="animal" className="text-sm font-medium">
+                        <label htmlFor="animal" className="text-sm font-medium text-stone-700">
                           Animal
                         </label>
                         <Select
@@ -518,7 +566,7 @@ function Admin() {
                           value={formulari.animal}
                           onValueChange={(value) => setFormulari({ ...formulari, animal: value })}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="border-stone-200 focus:ring-amber-300">
                             <SelectValue placeholder="Selecciona Animal" />
                           </SelectTrigger>
                           <SelectContent>
@@ -530,7 +578,7 @@ function Admin() {
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="categoria" className="text-sm font-medium">
+                        <label htmlFor="categoria" className="text-sm font-medium text-stone-700">
                           Categoria
                         </label>
                         <Select
@@ -538,7 +586,7 @@ function Admin() {
                           value={formulari.categoria}
                           onValueChange={(value) => setFormulari({ ...formulari, categoria: value })}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="border-stone-200 focus:ring-amber-300">
                             <SelectValue placeholder="Selecciona Categoria" />
                           </SelectTrigger>
                           <SelectContent>
@@ -551,7 +599,7 @@ function Admin() {
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="stock" className="text-sm font-medium">
+                        <label htmlFor="stock" className="text-sm font-medium text-stone-700">
                           Stock
                         </label>
                         <Input
@@ -562,11 +610,12 @@ function Admin() {
                           onChange={handleChange}
                           type="number"
                           required
+                          className="border-stone-200 focus:border-amber-300 focus:ring-amber-300"
                         />
                       </div>
 
                       <div className="md:col-span-2 flex justify-end">
-                        <Button type="submit" className="w-full md:w-auto">
+                        <Button type="submit" className="w-full md:w-auto bg-amber-600 hover:bg-amber-700 text-white">
                           <Plus className="mr-2 h-4 w-4" /> Afegir producte
                         </Button>
                       </div>
@@ -574,8 +623,8 @@ function Admin() {
                   </CardContent>
                 </Card>
 
-                <h2 className="text-2xl font-bold mt-8 mb-4 flex items-center gap-2">
-                  <Package className="h-5 w-5" /> Productes actuals
+                <h2 className="text-2xl font-bold mt-8 mb-4 flex items-center gap-2 text-stone-800">
+                  <Package className="h-5 w-5 text-amber-600" /> Productes actuals
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -586,8 +635,8 @@ function Admin() {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <Card className="overflow-hidden h-full flex flex-col">
-                        <div className="aspect-square overflow-hidden bg-gray-100">
+                      <Card className="overflow-hidden h-full flex flex-col border-0 shadow-md hover:shadow-lg transition-all duration-300">
+                        <div className="aspect-square overflow-hidden bg-stone-100">
                           <img
                             src={`/${prod.imatge}`}
                             alt={prod.nom}
@@ -596,14 +645,14 @@ function Admin() {
                         </div>
                         <CardContent className="p-4 flex-grow">
                           <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-semibold text-lg text-gray-900">{prod.nom}</h3>
+                            <h3 className="font-semibold text-lg text-stone-800">{prod.nom}</h3>
                             <Badge
                               variant="outline"
                               className={
                                 prod.stock > 10
-                                  ? "bg-green-50 text-green-700 border-green-200"
+                                  ? "bg-stone-50 text-stone-700 border-stone-200"
                                   : prod.stock > 0
-                                    ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                    ? "bg-amber-50 text-amber-700 border-amber-200"
                                     : "bg-red-50 text-red-700 border-red-200"
                               }
                             >
@@ -612,15 +661,15 @@ function Admin() {
                           </div>
 
                           <div className="flex gap-2 mb-2">
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                            <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-100">
                               {prod.animal}
                             </Badge>
-                            <Badge variant="secondary" className="bg-purple-100 text-purple-800 hover:bg-purple-100">
+                            <Badge variant="secondary" className="bg-stone-100 text-stone-800 hover:bg-stone-100">
                               {prod.categoria}
                             </Badge>
                           </div>
 
-                          <p className="text-sm text-gray-600 mb-4 line-clamp-2">{prod.descripcio}</p>
+                          <p className="text-sm text-stone-600 mb-4 line-clamp-2">{prod.descripcio}</p>
 
                           {editMode.id === prod.id && editMode.field === "preu" ? (
                             <div className="flex items-center gap-2 mb-2">
@@ -629,22 +678,33 @@ function Admin() {
                                 step="0.01"
                                 value={editMode.value}
                                 onChange={(e) => setEditMode({ ...editMode, value: e.target.value })}
-                                className="w-24"
+                                className="w-24 border-amber-200 focus:border-amber-300 focus:ring-amber-300"
                               />
-                              <Button size="icon" variant="ghost" onClick={saveEdit}>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={saveEdit}
+                                className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                              >
                                 <Save className="h-4 w-4" />
                               </Button>
-                              <Button size="icon" variant="ghost" onClick={cancelEdit}>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={cancelEdit}
+                                className="text-stone-600 hover:text-stone-700 hover:bg-stone-50"
+                              >
                                 <X className="h-4 w-4" />
                               </Button>
                             </div>
                           ) : (
                             <div className="flex items-center gap-2 mb-2">
-                              <span className="font-bold text-lg text-green-700">{prod.preu} €</span>
+                              <span className="font-bold text-lg text-amber-700">{prod.preu} €</span>
                               <Button
                                 size="icon"
                                 variant="ghost"
                                 onClick={() => editarPreu(prod.id, prod.preu, prod.stock)}
+                                className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -657,22 +717,33 @@ function Admin() {
                                 type="number"
                                 value={editMode.value}
                                 onChange={(e) => setEditMode({ ...editMode, value: e.target.value })}
-                                className="w-24"
+                                className="w-24 border-amber-200 focus:border-amber-300 focus:ring-amber-300"
                               />
-                              <Button size="icon" variant="ghost" onClick={saveEdit}>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={saveEdit}
+                                className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                              >
                                 <Save className="h-4 w-4" />
                               </Button>
-                              <Button size="icon" variant="ghost" onClick={cancelEdit}>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={cancelEdit}
+                                className="text-stone-600 hover:text-stone-700 hover:bg-stone-50"
+                              >
                                 <X className="h-4 w-4" />
                               </Button>
                             </div>
                           ) : (
                             <div className="flex items-center gap-2">
-                              <span className="text-sm text-gray-600">Stock: {prod.stock}</span>
+                              <span className="text-sm text-stone-600">Stock: {prod.stock}</span>
                               <Button
                                 size="icon"
                                 variant="ghost"
                                 onClick={() => editarStock(prod.id, prod.preu, prod.stock)}
+                                className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -680,7 +751,12 @@ function Admin() {
                           )}
                         </CardContent>
                         <CardFooter className="p-4 pt-0 flex justify-end">
-                          <Button variant="destructive" size="sm" onClick={() => eliminarProducte(prod.id)}>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => eliminarProducte(prod.id)}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
                             <Trash2 className="mr-2 h-4 w-4" /> Eliminar
                           </Button>
                         </CardFooter>
@@ -692,20 +768,22 @@ function Admin() {
 
               {/* Tab de Pedidos */}
               <TabsContent value="comandes" className="mt-6">
-                <Card className="mb-6">
-                  <CardHeader>
-                    <CardTitle>Filtres de comandes</CardTitle>
-                    <CardDescription>Filtra les comandes per data, estat o tipus d'enviament</CardDescription>
+                <Card className="mb-6 border-0 shadow-lg">
+                  <CardHeader className="bg-white border-b border-stone-100">
+                    <CardTitle className="text-stone-800">Filtres de comandes</CardTitle>
+                    <CardDescription className="text-stone-600">
+                      Filtra les comandes per data, estat o tipus d'enviament
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div className="space-y-2">
-                        <label htmlFor="cerca" className="text-sm font-medium">
+                        <label htmlFor="cerca" className="text-sm font-medium text-stone-700">
                           Cerca
                         </label>
                         <div className="relative">
                           <Search
-                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-500"
                             size={16}
                           />
                           <Input
@@ -713,18 +791,18 @@ function Admin() {
                             placeholder="Nom o telèfon"
                             value={filtreCerca}
                             onChange={(e) => setFiltreCerca(e.target.value)}
-                            className="pl-9"
+                            className="pl-9 border-stone-200 focus:border-amber-300 focus:ring-amber-300"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="data" className="text-sm font-medium">
+                        <label htmlFor="data" className="text-sm font-medium text-stone-700">
                           Data
                         </label>
                         <div className="relative">
                           <Calendar
-                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-500"
                             size={16}
                           />
                           <Input
@@ -732,17 +810,17 @@ function Admin() {
                             type="date"
                             value={filtreData}
                             onChange={(e) => setFiltreData(e.target.value)}
-                            className="pl-9"
+                            className="pl-9 border-stone-200 focus:border-amber-300 focus:ring-amber-300"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="estat" className="text-sm font-medium">
+                        <label htmlFor="estat" className="text-sm font-medium text-stone-700">
                           Estat
                         </label>
                         <Select value={filtreEstat} onValueChange={setFiltreEstat}>
-                          <SelectTrigger id="estat">
+                          <SelectTrigger id="estat" className="border-stone-200 focus:ring-amber-300">
                             <SelectValue placeholder="Selecciona estat" />
                           </SelectTrigger>
                           <SelectContent>
@@ -754,11 +832,11 @@ function Admin() {
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="enviament" className="text-sm font-medium">
+                        <label htmlFor="enviament" className="text-sm font-medium text-stone-700">
                           Enviament
                         </label>
                         <Select value={filtreEnviament} onValueChange={setFiltreEnviament}>
-                          <SelectTrigger id="enviament">
+                          <SelectTrigger id="enviament" className="border-stone-200 focus:ring-amber-300">
                             <SelectValue placeholder="Tipus d'enviament" />
                           </SelectTrigger>
                           <SelectContent>
@@ -770,7 +848,7 @@ function Admin() {
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="flex justify-between">
+                  <CardFooter className="flex justify-between p-6 bg-amber-50 border-t border-amber-100">
                     <Button
                       variant="outline"
                       onClick={() => {
@@ -779,10 +857,11 @@ function Admin() {
                         setFiltreEnviament("tots")
                         setFiltreCerca("")
                       }}
+                      className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
                     >
                       Netejar filtres
                     </Button>
-                    <Button onClick={exportarExcel}>
+                    <Button onClick={exportarExcel} className="bg-amber-600 hover:bg-amber-700 text-white">
                       <Download className="mr-2 h-4 w-4" /> Exportar a Excel
                     </Button>
                   </CardFooter>
@@ -790,13 +869,15 @@ function Admin() {
 
                 <div className="space-y-6">
                   {comandesFiltrades.length === 0 ? (
-                    <Card>
+                    <Card className="border-0 shadow-lg">
                       <CardContent className="flex flex-col items-center justify-center py-10">
-                        <div className="rounded-full bg-gray-100 p-3 mb-4">
-                          <Filter className="h-6 w-6 text-gray-400" />
+                        <div className="rounded-full bg-amber-100 p-3 mb-4">
+                          <Filter className="h-6 w-6 text-amber-600" />
                         </div>
-                        <h3 className="text-lg font-medium mb-2">No hi ha comandes amb aquests filtres</h3>
-                        <p className="text-gray-500 text-center max-w-md">
+                        <h3 className="text-lg font-medium mb-2 text-stone-800">
+                          No hi ha comandes amb aquests filtres
+                        </h3>
+                        <p className="text-stone-600 text-center max-w-md">
                           Prova de canviar els filtres o netejar-los per veure totes les comandes disponibles.
                         </p>
                       </CardContent>
@@ -805,24 +886,23 @@ function Admin() {
                     comandesFiltrades.map((comanda) => {
                       // Calcular el total de la comanda
                       let total = 0
-			let productsArray = []
+                      let productsArray = []
 
-			try {
-			  // Només parsejar si és un string
-			  if (typeof comanda.productes === "string") {
-			    productsArray = JSON.parse(comanda.productes)
-			  } else if (Array.isArray(comanda.productes)) {
-			    productsArray = comanda.productes
-			  }
+                      try {
+                        // Només parsejar si és un string
+                        if (typeof comanda.productes === "string") {
+                          productsArray = JSON.parse(comanda.productes)
+                        } else if (Array.isArray(comanda.productes)) {
+                          productsArray = comanda.productes
+                        }
 
-			  total = productsArray.reduce(
-			    (acc, p) => acc + (p.quantitat || 1) * Number.parseFloat(p.preu),
-			    0
-			  )
-			} catch (e) {
-			  console.error("Error parsejant productes:", e, comanda.productes)
-			}
-
+                        total = productsArray.reduce(
+                          (acc, p) => acc + (p.quantitat || 1) * Number.parseFloat(p.preu),
+                          0,
+                        )
+                      } catch (e) {
+                        console.error("Error parsejant productes:", e, comanda.productes)
+                      }
 
                       return (
                         <motion.div
@@ -831,24 +911,24 @@ function Admin() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.3 }}
                         >
-                          <Card>
-                            <CardHeader>
+                          <Card className="border-0 shadow-md hover:shadow-lg transition-all duration-300">
+                            <CardHeader className="bg-white border-b border-stone-100">
                               <div className="flex justify-between items-start">
                                 <div>
-                                  <CardTitle className="flex items-center gap-2">
+                                  <CardTitle className="flex items-center gap-2 text-stone-800">
                                     Comanda #{comanda.id}
                                     <Badge
                                       variant={comanda.estat === "enviada" ? "default" : "secondary"}
                                       className={
                                         comanda.estat === "enviada"
-                                          ? "bg-green-100 text-green-800 hover:bg-green-100"
-                                          : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+                                          ? "bg-stone-100 text-stone-800 hover:bg-stone-100"
+                                          : "bg-amber-100 text-amber-800 hover:bg-amber-100"
                                       }
                                     >
                                       {comanda.estat === "enviada" ? "Enviada" : "Pendent"}
                                     </Badge>
                                   </CardTitle>
-                                  <CardDescription>
+                                  <CardDescription className="text-stone-600">
                                     {new Date(comanda.data).toLocaleDateString()} -{" "}
                                     {new Date(comanda.data).toLocaleTimeString()}
                                   </CardDescription>
@@ -858,8 +938,8 @@ function Admin() {
                                     variant="outline"
                                     className={
                                       comanda.enviament === "domicili"
-                                        ? "bg-blue-50 text-blue-700 border-blue-200"
-                                        : "bg-purple-50 text-purple-700 border-purple-200"
+                                        ? "bg-amber-50 text-amber-700 border-amber-200"
+                                        : "bg-stone-50 text-stone-700 border-stone-200"
                                     }
                                   >
                                     {comanda.enviament === "domicili" ? (
@@ -872,24 +952,24 @@ function Admin() {
                                 </div>
                               </div>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="p-6">
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                  <h3 className="text-sm font-medium text-gray-500 mb-2">Dades del client</h3>
+                                  <h3 className="text-sm font-medium text-stone-500 mb-2">Dades del client</h3>
                                   <div className="space-y-2">
-                                    <p className="text-sm">
+                                    <p className="text-sm text-stone-700">
                                       <span className="font-medium">Nom:</span> {comanda.nom}
                                     </p>
-                                    <p className="text-sm">
+                                    <p className="text-sm text-stone-700">
                                       <span className="font-medium">Telèfon:</span> {comanda.telefon}
                                     </p>
                                     {comanda.enviament === "domicili" && (
-                                      <p className="text-sm">
+                                      <p className="text-sm text-stone-700">
                                         <span className="font-medium">Adreça:</span> {comanda.adreca}
                                       </p>
                                     )}
                                     {comanda.observacions && (
-                                      <p className="text-sm">
+                                      <p className="text-sm text-stone-700">
                                         <span className="font-medium">Observacions:</span> {comanda.observacions}
                                       </p>
                                     )}
@@ -897,34 +977,42 @@ function Admin() {
                                 </div>
 
                                 <div>
-                                  <h3 className="text-sm font-medium text-gray-500 mb-2">Productes</h3>
-                                  <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
+                                  <h3 className="text-sm font-medium text-stone-500 mb-2">Productes</h3>
+                                  <div className="space-y-2 max-h-40 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-amber-200 scrollbar-track-stone-100">
                                     {productsArray.length > 0 ? (
                                       productsArray.map((prod, index) => (
-                                        <div key={index} className="flex justify-between text-sm border-b pb-1">
-                                          <span>
+                                        <div
+                                          key={index}
+                                          className="flex justify-between text-sm border-b border-stone-100 pb-1"
+                                        >
+                                          <span className="text-stone-700">
                                             {prod.quantitat || 1} x {prod.nom}
                                           </span>
-                                          <span className="font-medium">
+                                          <span className="font-medium text-amber-700">
                                             {((prod.quantitat || 1) * Number.parseFloat(prod.preu)).toFixed(2)} €
                                           </span>
                                         </div>
                                       ))
                                     ) : (
-                                      <p className="text-sm text-gray-500">No hi ha detalls de productes disponibles</p>
+                                      <p className="text-sm text-stone-500">
+                                        No hi ha detalls de productes disponibles
+                                      </p>
                                     )}
                                   </div>
                                   <div className="flex justify-end mt-4">
-                                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
                                       Total: {total.toFixed(2)} €
                                     </Badge>
                                   </div>
                                 </div>
                               </div>
                             </CardContent>
-                            <CardFooter className="flex justify-end">
+                            <CardFooter className="flex justify-end p-4 bg-amber-50 border-t border-amber-100">
                               {comanda.estat !== "enviada" && (
-                                <Button onClick={() => marcarComEnviada(comanda.id)}>
+                                <Button
+                                  onClick={() => marcarComEnviada(comanda.id)}
+                                  className="bg-amber-600 hover:bg-amber-700 text-white"
+                                >
                                   <CheckCircle className="mr-2 h-4 w-4" /> Marcar com enviada
                                 </Button>
                               )}
@@ -943,18 +1031,22 @@ function Admin() {
 
       {/* Diálogo de confirmación para eliminar producto */}
       <Dialog open={confirmDelete !== null} onOpenChange={(open) => !open && setConfirmDelete(null)}>
-        <DialogContent>
+        <DialogContent className="border-amber-200">
           <DialogHeader>
-            <DialogTitle>Confirmar eliminació</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-stone-800">Confirmar eliminació</DialogTitle>
+            <DialogDescription className="text-stone-600">
               Estàs segur que vols eliminar aquest producte? Aquesta acció no es pot desfer.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmDelete(null)}>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDelete(null)}
+              className="border-amber-300 text-stone-700 hover:bg-stone-100"
+            >
               Cancel·lar
             </Button>
-            <Button variant="destructive" onClick={confirmDeleteProduct}>
+            <Button variant="destructive" onClick={confirmDeleteProduct} className="bg-red-600 hover:bg-red-700">
               Eliminar
             </Button>
           </DialogFooter>
@@ -965,7 +1057,4 @@ function Admin() {
 }
 
 export default withAuth(Admin)
-
-
-
 

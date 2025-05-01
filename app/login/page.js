@@ -11,10 +11,10 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-gray-50">
+        <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-stone-50">
           <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md flex flex-col items-center justify-center space-y-4">
-            <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-            <p className="text-gray-600 font-medium">Carregant login...</p>
+            <Loader2 className="h-8 w-8 text-amber-600 animate-spin" />
+            <p className="text-stone-600 font-medium">Carregant login...</p>
           </div>
         </div>
       }

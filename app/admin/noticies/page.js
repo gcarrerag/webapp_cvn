@@ -19,6 +19,7 @@ import {
   Plus,
   Loader2,
   CheckCircle,
+  PawPrint,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -212,11 +213,37 @@ function AdminNoticies() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-50">
       <Navbar />
       <Toaster position="top-right" />
 
-      <main className="container mx-auto py-8 px-4">
+      {/* Hero Section */}
+      <section className="relative py-16 bg-gradient-to-b from-amber-50 to-stone-100 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-64 bg-[url('/abstract-geometric-flow.png')] bg-cover opacity-10"></div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="container mx-auto px-4 text-center relative z-10"
+        >
+          <Badge className="mb-4 bg-amber-100 text-amber-800 border-amber-300">Administració</Badge>
+          <h1 className="text-4xl md:text-6xl font-bold text-stone-800 mb-6">Gestió de Notícies</h1>
+          <p className="text-stone-600 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
+            Crea i gestiona les notícies del Centre Veterinari Navarcles
+          </p>
+        </motion.div>
+
+        <motion.div
+          className="absolute bottom-0 right-0"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 0.1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <PawPrint className="h-64 w-64 text-amber-800" />
+        </motion.div>
+      </section>
+
+      <main className="container mx-auto py-12 px-4 -mt-6">
         <div className="max-w-5xl mx-auto">
           {/* Capçalera */}
           <motion.div
@@ -226,15 +253,19 @@ function AdminNoticies() {
             className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4"
           >
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Gestió de Notícies</h1>
-              <p className="text-gray-600">Centre Veterinari Navarcles</p>
+              <h2 className="text-2xl font-bold text-stone-800">Panell de notícies</h2>
+              <p className="text-stone-600">Crea i gestiona contingut per als teus clients</p>
             </div>
 
             <div className="flex items-center gap-4">
-              <Button variant="outline" onClick={() => router.push("/admin")}>
+              <Button
+                variant="outline"
+                onClick={() => router.push("/admin")}
+                className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
+              >
                 <ArrowLeft className="mr-2 h-4 w-4" /> Tornar al panell
               </Button>
-              <Button variant="destructive" onClick={tancarSessio}>
+              <Button variant="destructive" onClick={tancarSessio} className="bg-red-600 hover:bg-red-700">
                 <LogOut className="mr-2 h-4 w-4" /> Tancar sessió
               </Button>
             </div>
@@ -247,30 +278,38 @@ function AdminNoticies() {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="crear" className="flex items-center gap-2">
+              <TabsList className="grid w-full grid-cols-2 bg-stone-100">
+                <TabsTrigger
+                  value="crear"
+                  className="flex items-center gap-2 data-[state=active]:bg-amber-600 data-[state=active]:text-white"
+                >
                   <Plus className="h-4 w-4" /> {editantId ? "Editar Notícia" : "Crear Notícia"}
                 </TabsTrigger>
-                <TabsTrigger value="llistat" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="llistat"
+                  className="flex items-center gap-2 data-[state=active]:bg-amber-600 data-[state=active]:text-white"
+                >
                   <FileText className="h-4 w-4" /> Notícies Publicades
                 </TabsTrigger>
               </TabsList>
 
               {/* Tab de Crear/Editar Noticia */}
               <TabsContent value="crear" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{editantId ? "Editar notícia existent" : "Crear nova notícia"}</CardTitle>
-                    <CardDescription>
+                <Card className="border-0 shadow-lg">
+                  <CardHeader className="bg-white border-b border-stone-100">
+                    <CardTitle className="text-stone-800">
+                      {editantId ? "Editar notícia existent" : "Crear nova notícia"}
+                    </CardTitle>
+                    <CardDescription className="text-stone-600">
                       {editantId
                         ? "Modifica els camps necessaris i guarda els canvis"
                         : "Omple tots els camps per publicar una nova notícia"}
                     </CardDescription>
                   </CardHeader>
                   <form onSubmit={handleSubmit}>
-                    <CardContent className="space-y-6">
+                    <CardContent className="space-y-6 p-6">
                       <div className="space-y-2">
-                        <label htmlFor="titol" className="text-sm font-medium">
+                        <label htmlFor="titol" className="text-sm font-medium text-stone-700">
                           Títol de la notícia
                         </label>
                         <Input
@@ -279,20 +318,21 @@ function AdminNoticies() {
                           value={titol}
                           onChange={(e) => setTitol(e.target.value)}
                           required
+                          className="border-stone-200 focus:border-amber-300 focus:ring-amber-300"
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="cos" className="text-sm font-medium">
+                        <label htmlFor="cos" className="text-sm font-medium text-stone-700">
                           Contingut
                         </label>
-                        <div className="border rounded-md">
+                        <div className="border border-stone-200 rounded-md">
                           <Editor value={cos} onChange={setCos} />
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="imatge" className="text-sm font-medium">
+                        <label htmlFor="imatge" className="text-sm font-medium text-stone-700">
                           Imatge
                         </label>
                         <div className="flex items-center gap-4">
@@ -300,7 +340,7 @@ function AdminNoticies() {
                             type="button"
                             variant="outline"
                             onClick={() => fileInputRef.current?.click()}
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
                           >
                             <ImageIcon className="h-4 w-4" /> Seleccionar imatge
                           </Button>
@@ -312,7 +352,7 @@ function AdminNoticies() {
                             className="hidden"
                           />
                           {(imatge || imatgePreview) && (
-                            <span className="text-sm text-green-600">
+                            <span className="text-sm text-amber-600">
                               <CheckCircle className="inline-block mr-1 h-4 w-4" /> Imatge seleccionada
                             </span>
                           )}
@@ -320,8 +360,8 @@ function AdminNoticies() {
 
                         {(imatgePreview || imatge) && (
                           <div className="mt-4">
-                            <p className="text-sm text-gray-500 mb-2">Previsualització:</p>
-                            <div className="relative w-full max-w-md h-48 rounded-md overflow-hidden border">
+                            <p className="text-sm text-stone-500 mb-2">Previsualització:</p>
+                            <div className="relative w-full max-w-md h-48 rounded-md overflow-hidden border border-stone-200">
                               <img
                                 src={imatgePreview || "/placeholder.svg"}
                                 alt="Previsualització"
@@ -331,7 +371,7 @@ function AdminNoticies() {
                                 type="button"
                                 variant="destructive"
                                 size="sm"
-                                className="absolute top-2 right-2"
+                                className="absolute top-2 right-2 bg-red-600 hover:bg-red-700"
                                 onClick={() => {
                                   setImatge(null)
                                   setImatgePreview(null)
@@ -344,7 +384,7 @@ function AdminNoticies() {
                         )}
                       </div>
                     </CardContent>
-                    <CardFooter className="flex justify-between">
+                    <CardFooter className="flex justify-between p-6 bg-amber-50 border-t border-amber-100">
                       <Button
                         type="button"
                         variant="outline"
@@ -355,10 +395,11 @@ function AdminNoticies() {
                           setImatgePreview(null)
                           setEditantId(null)
                         }}
+                        className="border-amber-300 text-stone-700 hover:bg-stone-100"
                       >
                         Netejar
                       </Button>
-                      <Button type="submit" disabled={carregant}>
+                      <Button type="submit" disabled={carregant} className="bg-amber-600 hover:bg-amber-700 text-white">
                         {carregant ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -378,38 +419,43 @@ function AdminNoticies() {
 
               {/* Tab de Listar Noticias */}
               <TabsContent value="llistat" className="mt-6">
-                <Card className="mb-6">
-                  <CardHeader>
-                    <CardTitle>Notícies publicades</CardTitle>
-                    <CardDescription>Gestiona les notícies existents del Centre Veterinari Navarcles</CardDescription>
+                <Card className="mb-6 border-0 shadow-lg">
+                  <CardHeader className="bg-white border-b border-stone-100">
+                    <CardTitle className="text-stone-800">Notícies publicades</CardTitle>
+                    <CardDescription className="text-stone-600">
+                      Gestiona les notícies existents del Centre Veterinari Navarcles
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-6">
                     {loading ? (
                       <div className="space-y-6">
                         {[...Array(3)].map((_, index) => (
                           <div key={index} className="flex flex-col space-y-3">
-                            <Skeleton className="h-8 w-3/4" />
-                            <Skeleton className="h-4 w-1/4" />
-                            <Skeleton className="h-32 w-full" />
+                            <Skeleton className="h-8 w-3/4 bg-stone-200" />
+                            <Skeleton className="h-4 w-1/4 bg-stone-200" />
+                            <Skeleton className="h-32 w-full bg-stone-200" />
                             <div className="flex gap-2">
-                              <Skeleton className="h-10 w-20" />
-                              <Skeleton className="h-10 w-20" />
+                              <Skeleton className="h-10 w-20 bg-stone-200" />
+                              <Skeleton className="h-10 w-20 bg-stone-200" />
                             </div>
-                            <Separator className="my-2" />
+                            <Separator className="my-2 bg-stone-200" />
                           </div>
                         ))}
                       </div>
                     ) : noticies.length === 0 ? (
                       <div className="text-center py-12">
-                        <div className="rounded-full bg-gray-100 p-3 inline-flex mb-4">
-                          <FileText className="h-6 w-6 text-gray-400" />
+                        <div className="rounded-full bg-amber-100 p-3 inline-flex mb-4">
+                          <FileText className="h-6 w-6 text-amber-600" />
                         </div>
-                        <h3 className="text-lg font-medium mb-2">No hi ha notícies publicades</h3>
-                        <p className="text-gray-500 text-center max-w-md mx-auto mb-6">
+                        <h3 className="text-lg font-medium mb-2 text-stone-800">No hi ha notícies publicades</h3>
+                        <p className="text-stone-600 text-center max-w-md mx-auto mb-6">
                           Comença a crear notícies per mantenir informats als teus clients sobre novetats i
                           actualitzacions.
                         </p>
-                        <Button onClick={() => setActiveTab("crear")}>
+                        <Button
+                          onClick={() => setActiveTab("crear")}
+                          className="bg-amber-600 hover:bg-amber-700 text-white"
+                        >
                           <Plus className="mr-2 h-4 w-4" /> Crear primera notícia
                         </Button>
                       </div>
@@ -424,7 +470,7 @@ function AdminNoticies() {
                           >
                             <div className="flex flex-col md:flex-row gap-6">
                               {noticia.imatge && (
-                                <div className="w-full md:w-1/3 h-48 rounded-md overflow-hidden bg-gray-100">
+                                <div className="w-full md:w-1/3 h-48 rounded-md overflow-hidden bg-stone-100 border border-stone-200">
                                   <img
                                     src={noticia.imatge || "/placeholder.svg"}
                                     alt={noticia.titol}
@@ -434,32 +480,46 @@ function AdminNoticies() {
                               )}
                               <div className="flex-1">
                                 <div className="flex justify-between items-start mb-2">
-                                  <h3 className="text-xl font-bold">{noticia.titol}</h3>
-                                  <Badge variant="outline" className="flex items-center gap-1">
+                                  <h3 className="text-xl font-bold text-stone-800">{noticia.titol}</h3>
+                                  <Badge
+                                    variant="outline"
+                                    className="flex items-center gap-1 bg-amber-50 text-amber-700 border-amber-200"
+                                  >
                                     <Calendar className="h-3 w-3" /> {formatDate(noticia.data)}
                                   </Badge>
                                 </div>
-                                <p className="text-gray-600 mb-4 line-clamp-3">
+                                <p className="text-stone-600 mb-4 line-clamp-3">
                                   {extractSummary(noticia.contingut, 200)}
                                 </p>
                                 <div className="flex flex-wrap gap-2">
-                                  <Button variant="outline" size="sm" onClick={() => iniciarEdicio(noticia)}>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => iniciarEdicio(noticia)}
+                                    className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
+                                  >
                                     <Edit className="mr-2 h-4 w-4" /> Editar
                                   </Button>
-                                  <Button variant="destructive" size="sm" onClick={() => eliminarNoticia(noticia.id)}>
+                                  <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => eliminarNoticia(noticia.id)}
+                                    className="bg-red-600 hover:bg-red-700"
+                                  >
                                     <Trash2 className="mr-2 h-4 w-4" /> Eliminar
                                   </Button>
                                   <Button
                                     variant="secondary"
                                     size="sm"
                                     onClick={() => window.open(`/noticies/${noticia.id}`, "_blank")}
+                                    className="bg-stone-100 text-stone-800 hover:bg-stone-200"
                                   >
                                     <Eye className="mr-2 h-4 w-4" /> Previsualitzar
                                   </Button>
                                 </div>
                               </div>
                             </div>
-                            {index < noticies.length - 1 && <Separator className="my-6" />}
+                            {index < noticies.length - 1 && <Separator className="my-6 bg-stone-200" />}
                           </motion.div>
                         ))}
                       </div>
@@ -474,18 +534,22 @@ function AdminNoticies() {
 
       {/* Diálogo de confirmación para eliminar noticia */}
       <Dialog open={confirmDelete !== null} onOpenChange={(open) => !open && setConfirmDelete(null)}>
-        <DialogContent>
+        <DialogContent className="border-amber-200">
           <DialogHeader>
-            <DialogTitle>Confirmar eliminació</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-stone-800">Confirmar eliminació</DialogTitle>
+            <DialogDescription className="text-stone-600">
               Estàs segur que vols eliminar aquesta notícia? Aquesta acció no es pot desfer.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmDelete(null)}>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDelete(null)}
+              className="border-amber-300 text-stone-700 hover:bg-stone-100"
+            >
               Cancel·lar
             </Button>
-            <Button variant="destructive" onClick={confirmDeleteNoticia}>
+            <Button variant="destructive" onClick={confirmDeleteNoticia} className="bg-red-600 hover:bg-red-700">
               Eliminar
             </Button>
           </DialogFooter>
@@ -496,8 +560,4 @@ function AdminNoticies() {
 }
 
 export default withAuth(AdminNoticies)
-
-
-
-
 
