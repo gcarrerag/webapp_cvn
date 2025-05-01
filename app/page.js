@@ -143,7 +143,7 @@ export default function Home() {
           backgroundImage: "url('/portada.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          backgroundAttachment: "fixed",
+          backgroundAttachment: "scroll",
         }}
       >
         <div
